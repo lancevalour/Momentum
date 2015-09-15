@@ -1,0 +1,37 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+
+        <item name="android:textColor">@color/color_body</item>
+        <item name="colorPrimary">@color/theme_primary</item>
+        <item name="colorPrimaryDark">@color/theme_primary_dark</item>
+        <item name="colorAccent">@color/theme_accent</item>
+
+    </style>
+
+
+    <style name="ToolBarTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:textColorPrimary">@color/text_primary_light</item>
+        <item name="actionMenuTextColor">@color/text_primary_light</item>
+        <item name="android:textColorSecondary">@color/text_primary_light</item>
+        <item name="colorPrimary">@color/theme_primary</item>
+        <item name="colorPrimaryDark">@color/theme_primary_dark</item>
+        <item name="colorAccent">@color/theme_accent</item>
+    </style>
+
+    <style name="FontSubheader" parent="@android:style/TextAppearance">
+        <item name="android:textColor">@color/color_subheader</item>
+        <item name="android:typeface">normal</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="FontBody" parent="@android:style/TextAppearance">
+        <item name="android:textColor">@color/color_body</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:typeface">normal</item>
+    </style>
+
+
+</resources>

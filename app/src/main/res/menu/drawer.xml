@@ -1,0 +1,23 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/drawer_portfolio"
+            android:checked="true"
+            android:icon="@drawable/ic_action_navigation_menu"
+            android:title="@string/drawer_title_portfolio" />
+
+        <item
+            android:id="@+id/drawer_trending"
+            android:icon="@drawable/ic_action_navigation_menu"
+            android:title="@string/drawer_title_trending" />
+
+
+        <item
+            android:id="@+id/drawer_settings"
+            android:icon="@drawable/ic_action_navigation_menu"
+            android:title="@string/title_section3" />
+
+    </group>
+</menu>
