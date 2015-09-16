@@ -81,7 +81,6 @@ public class PortfolioFragment extends Fragment {
                             stockList.add(YahooFinance.get("INDU"));
                             stockList.add(YahooFinance.get("^IXIC"));
 
-
                             Message msg = Message.obtain();
                             msg.what = 1;
                             handler.sendMessage(msg);

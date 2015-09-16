@@ -21,7 +21,11 @@ import android.widget.Toast;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 
 import yicheng.android.app.momentum.R;
+import yicheng.android.app.momentum.fragment.FavoriteFragment;
+import yicheng.android.app.momentum.fragment.MarketFragment;
 import yicheng.android.app.momentum.fragment.PortfolioFragment;
+import yicheng.android.app.momentum.fragment.SettingsFragment;
+import yicheng.android.app.momentum.fragment.TrendingFragment;
 
 /**
  * Created by ZhangY on 8/17/2015.
@@ -114,19 +118,29 @@ public class NavigationDrawerActivity extends AppCompatActivity {
         int titleStringID = R.string.app_name;
 
         switch (itemId) {
+            case R.id.drawer_market: {
+                frontFragment = new MarketFragment();
+                titleStringID = R.string.drawer_title_market;
+            }
+            break;
             case R.id.drawer_portfolio: {
                 frontFragment = new PortfolioFragment();
                 titleStringID = R.string.drawer_title_portfolio;
             }
             break;
+            case R.id.drawer_favorite:{
+                frontFragment = new FavoriteFragment();
+                titleStringID = R.string.drawer_title_favorite;
+            }
+            break;
             case R.id.drawer_trending: {
-                frontFragment = new PortfolioFragment();
+                frontFragment = new TrendingFragment();
                 titleStringID = R.string.drawer_title_trending;
             }
             break;
             case R.id.drawer_settings: {
-                frontFragment = new PortfolioFragment();
-                titleStringID = R.string.drawer_title_portfolio;
+                frontFragment = new SettingsFragment();
+                titleStringID = R.string.drawer_title_settings;
             }
             break;
         }

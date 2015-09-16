@@ -2,22 +2,35 @@
 
     <group android:checkableBehavior="single">
 
+
         <item
-            android:id="@+id/drawer_portfolio"
+            android:id="@+id/drawer_market"
             android:checked="true"
-            android:icon="@drawable/ic_action_navigation_menu"
-            android:title="@string/drawer_title_portfolio" />
+            android:icon="@drawable/ic_action_market"
+            android:title="@string/drawer_title_market" />
 
         <item
             android:id="@+id/drawer_trending"
-            android:icon="@drawable/ic_action_navigation_menu"
+            android:icon="@drawable/ic_action_trending"
             android:title="@string/drawer_title_trending" />
+
+        <item
+            android:id="@+id/drawer_portfolio"
+            android:checked="true"
+            android:icon="@drawable/ic_action_portfolio"
+            android:title="@string/drawer_title_portfolio" />
+
+        <item
+            android:id="@+id/drawer_favorite"
+            android:checked="true"
+            android:icon="@drawable/ic_action_like"
+            android:title="@string/drawer_title_favorite" />
 
 
         <item
             android:id="@+id/drawer_settings"
-            android:icon="@drawable/ic_action_navigation_menu"
-            android:title="@string/title_section3" />
+            android:icon="@drawable/ic_action_settings"
+            android:title="@string/drawer_title_settings" />
 
     </group>
 </menu>
