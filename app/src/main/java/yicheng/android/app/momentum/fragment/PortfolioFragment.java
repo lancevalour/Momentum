@@ -38,87 +38,22 @@ public class PortfolioFragment extends Fragment {
 
         rootView = (ViewGroup) inflater.inflate(R.layout.fragment_portfolio, container, false);
 
-        setHandlerControl();
-
-        loadStockData();
-
-        initiateComponents();
 
         return rootView;
 
     }
 
     private void setHandlerControl() {
-        handler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                switch (msg.what) {
-                    case 1: {
-                        fragment_portfolio_recyclerView.setAdapter(new PortfolioFragmentRecyclerAdapter(stockList));
-                    }
-                    break;
-
-                }
-            }
-        };
 
     }
 
 
     private void loadStockData() {
-        stockList = new ArrayList<Stock>();
-
-        getActivity().runOnUiThread(new Runnable() {
-
-            @Override
-            public void run() {
-                new Thread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        try {
-                            stockList.add(YahooFinance.get("^GSPC"));
-                            stockList.add(YahooFinance.get("INDU"));
-                            stockList.add(YahooFinance.get("^IXIC"));
-
-                            Message msg = Message.obtain();
-                            msg.what = 1;
-                            handler.sendMessage(msg);
-
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }).start();
-            }
-        });
 
     }
 
     private void initiateComponents() {
-        fragment_portfolio_recyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_portfolio_recyclerView);
 
-
-        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2, 1);
-        fragment_portfolio_recyclerView.setLayoutManager(layoutManager);
-
-        ItemTouchHelper.SimpleCallback simpleItemTouchCallback =
-                new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
-
-                    @Override
-                    public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                        return false;
-                    }
-
-                    @Override
-                    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-
-                    }
-                };
-
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
-
-        itemTouchHelper.attachToRecyclerView(fragment_portfolio_recyclerView);
     }
 
 

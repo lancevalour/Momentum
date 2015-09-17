@@ -16,6 +16,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.support.v7.widget.Toolbar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
@@ -42,6 +43,8 @@ public class NavigationDrawerActivity extends AppCompatActivity {
 
     ActionBarDrawerToggle drawerToggle;
 
+    TextView email;
+
 
     private final Handler drawerActionHandler = new Handler();
 
@@ -59,6 +62,10 @@ public class NavigationDrawerActivity extends AppCompatActivity {
     }
 
     private void initiateComponents() {
+        email = (TextView) findViewById(R.id.email);
+        email.setText("haha");
+
+
         activity_navigation_drawer_layout = (DrawerLayout) findViewById(R.id.activity_navigation_drawer_layout);
 
         activity_navigation_drawer_toolbar = (Toolbar) findViewById(R.id.activity_navigation_drawer_toolbar);
@@ -66,18 +73,12 @@ public class NavigationDrawerActivity extends AppCompatActivity {
         setSupportActionBar(activity_navigation_drawer_toolbar);
 
 
-     /*   final ActionBar actionBar = getSupportActionBar();
-
-        if (actionBar != null) {
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_action_navigation_menu);
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }*/
         activity_navigation_drawer_content_framelayout = (FrameLayout) findViewById(R.id.activity_navigation_drawer_content_framelayout);
 
         activity_navigation_drawer_navigation_view = (NavigationView) findViewById(R.id.activity_navigation_drawer_navigation_view);
 
 
-        activity_navigation_drawer_navigation_view.getMenu().findItem(R.id.drawer_portfolio).setChecked(true);
+        activity_navigation_drawer_navigation_view.getMenu().findItem(R.id.drawer_market).setChecked(true);
 
         activity_navigation_drawer_floatingActionMenu = (FloatingActionsMenu) findViewById(R.id.activity_navigation_drawer_floatingActionMenu);
 
@@ -106,7 +107,7 @@ public class NavigationDrawerActivity extends AppCompatActivity {
         drawerToggle.syncState();
 
 
-        curDrawerItemId = R.id.drawer_portfolio;
+        curDrawerItemId = R.id.drawer_market;
 
         navigate(curDrawerItemId);
 
@@ -128,7 +129,7 @@ public class NavigationDrawerActivity extends AppCompatActivity {
                 titleStringID = R.string.drawer_title_portfolio;
             }
             break;
-            case R.id.drawer_favorite:{
+            case R.id.drawer_favorite: {
                 frontFragment = new FavoriteFragment();
                 titleStringID = R.string.drawer_title_favorite;
             }
@@ -212,7 +213,7 @@ public class NavigationDrawerActivity extends AppCompatActivity {
                 // so the user can see what is happening
                 activity_navigation_drawer_layout.closeDrawer(GravityCompat.START);
 
-                Toast.makeText(getBaseContext(), "" + curDrawerItemId, Toast.LENGTH_SHORT).show();
+
                 drawerActionHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {

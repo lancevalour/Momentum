@@ -29,8 +29,7 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:22.2.+'
     compile 'com.yahoofinance-api:YahooFinanceAPI:2.0.0'
 
-/*    compile 'com.snappydb:snappydb-lib:0.5.2'
-    compile 'com.esotericsoftware.kryo:kryo:2.24.0'*/
-
+    compile 'com.snappydb:snappydb-lib:0.5.2'
+    compile 'com.esotericsoftware.kryo:kryo:2.24.0'
 
 }
