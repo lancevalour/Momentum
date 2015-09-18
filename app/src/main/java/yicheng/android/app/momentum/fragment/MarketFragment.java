@@ -1,9 +1,12 @@
 package yicheng.android.app.momentum.fragment;
 
 import android.app.Fragment;
+import android.app.PendingIntent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -18,13 +21,15 @@ import java.util.List;
 import yahoofinance.Stock;
 import yahoofinance.YahooFinance;
 import yicheng.android.app.momentum.R;
-import yicheng.android.app.momentum.adapter.PortfolioFragmentRecyclerAdapter;
+import yicheng.android.app.momentum.adapter.StockRecyclerAdapter;
 
 /**
  * Created by ZhangY on 9/16/2015.
  */
 public class MarketFragment extends Fragment {
     ViewGroup rootView;
+
+    SwipeRefreshLayout fragment_market_refreshLayout;
 
     RecyclerView fragment_market_recyclerView;
 
@@ -38,11 +43,14 @@ public class MarketFragment extends Fragment {
 
         rootView = (ViewGroup) inflater.inflate(R.layout.fragment_market, container, false);
 
+        initiateComponents();
+
         setHandlerControl();
 
         loadStockData();
 
-        initiateComponents();
+        setComponentControl();
+
 
         return rootView;
 
@@ -54,9 +62,13 @@ public class MarketFragment extends Fragment {
             public void handleMessage(Message msg) {
                 switch (msg.what) {
                     case 1: {
-                        fragment_market_recyclerView.setAdapter(new PortfolioFragmentRecyclerAdapter(stockList));
+                        fragment_market_recyclerView.setAdapter(new StockRecyclerAdapter(stockList));
+                        if (fragment_market_refreshLayout.isRefreshing()) {
+                            fragment_market_refreshLayout.setRefreshing(false);
+                        }
                     }
                     break;
+
 
                 }
             }
@@ -80,6 +92,10 @@ public class MarketFragment extends Fragment {
                             stockList.add(YahooFinance.get("^QNET"));
                             stockList.add(YahooFinance.get("^IXCO"));
                             stockList.add(YahooFinance.get("^IXIC"));
+                            stockList.add(YahooFinance.get("^NBI"));
+                            stockList.add(YahooFinance.get("^CHXN"));
+                            stockList.add(YahooFinance.get("^IXHC"));
+
 
                             Message msg = Message.obtain();
                             msg.what = 1;
@@ -102,23 +118,28 @@ public class MarketFragment extends Fragment {
         StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2, 1);
         fragment_market_recyclerView.setLayoutManager(layoutManager);
 
-        ItemTouchHelper.SimpleCallback simpleItemTouchCallback =
-                new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
 
-                    @Override
-                    public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                        return false;
-                    }
+        fragment_market_refreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.fragment_market_refreshLayout);
 
-                    @Override
-                    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+        fragment_market_refreshLayout.setColorSchemeColors(Color
+                .parseColor("#4b994f"));
 
-                    }
-                };
+        fragment_market_refreshLayout.setRefreshing(true);
 
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
 
-        itemTouchHelper.attachToRecyclerView(fragment_market_recyclerView);
+    }
+
+    private void setComponentControl() {
+        setRefreshLayoutControl();
+    }
+
+    private void setRefreshLayoutControl() {
+        fragment_market_refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                loadStockData();
+            }
+        });
     }
 
 
