@@ -7,21 +7,28 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+
+import com.snappydb.DB;
+import com.snappydb.SnappydbException;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import yahoofinance.Stock;
 import yahoofinance.YahooFinance;
 import yicheng.android.app.momentum.R;
 import yicheng.android.app.momentum.adapter.StockRecyclerAdapter;
+import yicheng.android.app.momentum.model.Snappy;
 
 /**
  * Created by ZhangY on 9/16/2015.
@@ -33,7 +40,12 @@ public class MarketFragment extends Fragment {
 
     RecyclerView fragment_market_recyclerView;
 
+    StaggeredGridLayoutManager layoutManager;
+
+
     List<Stock> stockList;
+
+    DB favoriteDB;
 
     Handler handler;
 
@@ -62,10 +74,11 @@ public class MarketFragment extends Fragment {
             public void handleMessage(Message msg) {
                 switch (msg.what) {
                     case 1: {
-                        fragment_market_recyclerView.setAdapter(new StockRecyclerAdapter(stockList));
                         if (fragment_market_refreshLayout.isRefreshing()) {
                             fragment_market_refreshLayout.setRefreshing(false);
                         }
+                        fragment_market_recyclerView.setAdapter(new StockRecyclerAdapter(stockList));
+
                     }
                     break;
 
@@ -89,13 +102,12 @@ public class MarketFragment extends Fragment {
                     @Override
                     public void run() {
                         try {
-                            stockList.add(YahooFinance.get("^QNET"));
-                            stockList.add(YahooFinance.get("^IXCO"));
-                            stockList.add(YahooFinance.get("^IXIC"));
-                            stockList.add(YahooFinance.get("^NBI"));
-                            stockList.add(YahooFinance.get("^CHXN"));
-                            stockList.add(YahooFinance.get("^IXHC"));
+                            String[] names = new String[]{"CNYMUR=X", "^IXCO",
+                                    "^IXIC", "F000002L06.TO", "FSRBX", "FSPHX"
+                            };
 
+                            Map<String, Stock> map = YahooFinance.get(names);
+                            stockList.addAll(map.values());
 
                             Message msg = Message.obtain();
                             msg.what = 1;
@@ -111,12 +123,14 @@ public class MarketFragment extends Fragment {
 
     }
 
+
     private void initiateComponents() {
         fragment_market_recyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_market_recyclerView);
 
 
-        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2, 1);
+        layoutManager = new StaggeredGridLayoutManager(2, 1);
         fragment_market_recyclerView.setLayoutManager(layoutManager);
+        fragment_market_recyclerView.setItemAnimator(new DefaultItemAnimator());
 
 
         fragment_market_refreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.fragment_market_refreshLayout);
@@ -131,6 +145,22 @@ public class MarketFragment extends Fragment {
 
     private void setComponentControl() {
         setRefreshLayoutControl();
+        setRecyclerViewControl();
+
+    }
+
+    private void setRecyclerViewControl() {
+      /*  fragment_market_recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(int newState) {
+            }
+
+            @Override
+            public void onScrolled(int dx, int dy) {
+                LinearLayout.LayoutParams
+                fragment_market_refreshLayout.setEnabled(layoutManager.findFirstCompletelyVisibleItemPosition() == 0);
+            }
+        });*/
     }
 
     private void setRefreshLayoutControl() {

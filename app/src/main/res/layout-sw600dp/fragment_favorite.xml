@@ -8,4 +8,20 @@
     android:paddingTop="@dimen/activity_vertical_margin">
 
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/fragment_favorite_recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <TextView
+        android:id="@+id/fragment_favorite_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:fontFamily="sans-serif-light"
+        android:text="No Favorite"
+        android:textColor="@color/color_subheader"
+        android:textSize="36sp" />
+
+
 </RelativeLayout>

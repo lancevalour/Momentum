@@ -1,25 +1,34 @@
 package yicheng.android.app.momentum.activity;
 
 import android.app.Fragment;
-import android.app.FragmentManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.support.v7.widget.Toolbar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.getbase.floatingactionbutton.FloatingActionsMenu;
+import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 
 import yicheng.android.app.momentum.R;
 import yicheng.android.app.momentum.fragment.FavoriteFragment;
@@ -39,7 +48,8 @@ public class NavigationDrawerActivity extends AppCompatActivity {
 
     NavigationView activity_navigation_drawer_navigation_view;
 
-    FloatingActionsMenu activity_navigation_drawer_floatingActionMenu;
+
+    FloatingActionButton activity_navigation_drawer_search_fab;
 
     ActionBarDrawerToggle drawerToggle;
 
@@ -55,7 +65,7 @@ public class NavigationDrawerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_navigation_drawer);
         initiateComponents();
         setComponentControl();
 
@@ -80,7 +90,10 @@ public class NavigationDrawerActivity extends AppCompatActivity {
 
         activity_navigation_drawer_navigation_view.getMenu().findItem(R.id.drawer_market).setChecked(true);
 
-        activity_navigation_drawer_floatingActionMenu = (FloatingActionsMenu) findViewById(R.id.activity_navigation_drawer_floatingActionMenu);
+
+        activity_navigation_drawer_search_fab = (FloatingActionButton) findViewById(R.id.activity_navigation_drawer_search_fab);
+        activity_navigation_drawer_search_fab.setIcon(R.drawable.ic_action_search);
+        //  activity_navigation_drawer_floatingActionMenu = (FloatingActionsMenu) findViewById(R.id.activity_navigation_drawer_floatingActionMenu);
 
 
         drawerToggle = new ActionBarDrawerToggle(this, activity_navigation_drawer_layout, activity_navigation_drawer_toolbar, R.string.navigation_drawer_open,
@@ -122,6 +135,23 @@ public class NavigationDrawerActivity extends AppCompatActivity {
             case R.id.drawer_market: {
                 frontFragment = new MarketFragment();
                 titleStringID = R.string.drawer_title_market;
+               /* runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    System.out.println(
+                                            get("http://d.yimg.com/autoc.finance.yahoo.com/autoc?query=yahoo&callback=YAHOO.Finance.SymbolSuggest.ssCallback"));
+
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }).start();
+                    }
+                });*/
             }
             break;
             case R.id.drawer_portfolio: {
@@ -161,45 +191,66 @@ public class NavigationDrawerActivity extends AppCompatActivity {
 
     private void setComponentControl() {
         setNavigationViewControl();
-        setFloatingActionMenuControl();
+
         setFloatingActionButtonControl();
     }
 
     private void setFloatingActionButtonControl() {
+        activity_navigation_drawer_search_fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(NavigationDrawerActivity.this, StockSearchActivity.class);
+                v.getContext().startActivity(intent);
 
+
+             /*   runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+
+                                    try {
+                                        String response = get("http://d.yimg.com/autoc.finance.yahoo.com/autoc?query=yahoo&callback=YAHOO.Finance.SymbolSuggest.ssCallback");
+
+                                        response = response.substring("YAHOO.Finance.SymbolSuggest.ssCallback(".length(), response.length() - 1);
+
+
+                                        JSONObject object = new JSONObject(response);
+
+                                        JSONArray array = object.getJSONObject("ResultSet").getJSONArray("Result");
+
+                                        for (int i = 0; i < array.length(); i++) {
+                                            System.out.println(array.getJSONObject(i).get("symbol"));
+                                        }
+
+
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }).start();
+                    }
+                });*/
+            }
+        });
     }
 
 
-    private void setFloatingActionMenuControl() {
-        activity_navigation_drawer_content_framelayout
-                .setOnTouchListener(new View.OnTouchListener() {
+    OkHttpClient client = new OkHttpClient();
 
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        // TODO Auto-generated method stub
-                        if (activity_navigation_drawer_floatingActionMenu
-                                .isExpanded()) {
-                            activity_navigation_drawer_floatingActionMenu
-                                    .collapse();
-                        }
-                        return false;
-                    }
-                });
+    private String get(String url) throws IOException {
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
 
-        activity_navigation_drawer_toolbar
-                .setOnTouchListener(new View.OnTouchListener() {
-
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        // TODO Auto-generated method stub
-                        if (activity_navigation_drawer_floatingActionMenu
-                                .isExpanded()) {
-                            activity_navigation_drawer_floatingActionMenu
-                                    .collapse();
-                        }
-                        return false;
-                    }
-                });
+        Response response = client.newCall(request).execute();
+        return response.body().string();
     }
 
     private void setNavigationViewControl() {
@@ -222,6 +273,18 @@ public class NavigationDrawerActivity extends AppCompatActivity {
                 }, DRAWER_CLOSE_DELAY_MS);
                 return true;
             }
-        });
+        })
+    ;
+}
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+
+        return true;
     }
+
+
 }

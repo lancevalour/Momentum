@@ -1,12 +1,36 @@
 package yicheng.android.app.momentum.fragment;
 
 import android.app.Fragment;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.snappydb.DB;
+import com.snappydb.KeyIterator;
+import com.snappydb.SnappydbException;
+
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import yahoofinance.Stock;
+import yahoofinance.YahooFinance;
 import yicheng.android.app.momentum.R;
+import yicheng.android.app.momentum.adapter.FavoriteRecyclerAdapter;
+import yicheng.android.app.momentum.model.Snappy;
 
 /**
  * Created by ZhangY on 9/16/2015.
@@ -14,13 +38,150 @@ import yicheng.android.app.momentum.R;
 public class FavoriteFragment extends Fragment {
     ViewGroup rootView;
 
+    RecyclerView fragment_favorite_recyclerView;
+
+    StaggeredGridLayoutManager layoutManager;
+
+    TextView fragment_favorite_textView;
+
+
+    List<Stock> stockList;
+
+    DB favoriteDB;
+
+    Handler handler;
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         rootView = (ViewGroup) inflater.inflate(R.layout.fragment_favorite, container, false);
 
+
+        initiateComponents();
+
+        setHandlerControl();
+
+        loadStockData();
+
+        setComponentControl();
+
+
         return rootView;
 
     }
+
+    private void initiateComponents() {
+        fragment_favorite_recyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_favorite_recyclerView);
+
+
+        layoutManager = new StaggeredGridLayoutManager(2, 1);
+        fragment_favorite_recyclerView.setLayoutManager(layoutManager);
+        fragment_favorite_recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback =
+                new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+
+                    @Override
+                    public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                        return false;
+                    }
+
+                    @Override
+                    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+
+                    }
+                };
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+
+        itemTouchHelper.attachToRecyclerView(fragment_favorite_recyclerView);
+
+        fragment_favorite_textView = (TextView) rootView.findViewById(R.id.fragment_favorite_textView);
+        fragment_favorite_textView.setVisibility(View.INVISIBLE);
+    }
+
+    private void setHandlerControl() {
+        handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case 1: {
+                        if (stockList.size() == 0) {
+                            fragment_favorite_textView.setVisibility(View.VISIBLE);
+
+                        } else {
+                            fragment_favorite_textView.setVisibility(View.INVISIBLE);
+                        }
+
+                        fragment_favorite_recyclerView.setAdapter(new FavoriteRecyclerAdapter(stockList));
+
+                    }
+                    break;
+
+
+                }
+            }
+        };
+    }
+
+    private void loadStockData() {
+        stockList = new ArrayList<Stock>();
+
+        getActivity().runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                new Thread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        try {
+
+                            String[] keys = null;
+
+                            try {
+
+                                favoriteDB = Snappy.open(rootView.getContext(), Snappy.DB_NAME_FAVORITE);
+                                KeyIterator keyIt = favoriteDB.allKeysIterator();
+                                if (keyIt.hasNext()) {
+                                    keys = keyIt.next(10000);
+                                    System.out.println(Arrays.toString(keys));
+                                }
+                                keyIt.close();
+                                favoriteDB.close();
+
+                            } catch (SnappydbException e) {
+                                e.printStackTrace();
+                            }
+
+
+                            if (keys != null) {
+
+                                Map<String, Stock> map = YahooFinance.get(keys);
+                                stockList.addAll(map.values());
+                            }
+
+                            Message msg = Message.obtain();
+                            msg.what = 1;
+                            handler.sendMessage(msg);
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+            }
+        });
+
+
+    }
+
+
+    private void setComponentControl() {
+
+    }
+
+
 }

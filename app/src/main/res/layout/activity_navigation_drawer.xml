@@ -31,34 +31,21 @@
             android:layout_height="match_parent"
             android:layout_below="@id/activity_navigation_drawer_toolbar" />
 
-        <com.getbase.floatingactionbutton.FloatingActionsMenu
-            android:id="@+id/activity_navigation_drawer_floatingActionMenu"
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/activity_navigation_drawer_search_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:layout_marginBottom="10dp"
             android:layout_marginRight="10dp"
-            fab:fab_addButtonColorNormal="@color/theme_primary"
-            fab:fab_addButtonColorPressed="@color/theme_primary_dark"
-            fab:fab_addButtonPlusIconColor="@color/text_primary_light">
+            fab:fab_colorNormal="@color/theme_primary"
+            fab:fab_colorPressed="@color/theme_primary_dark"
+            fab:fab_title="Another one on the right">
 
-            <com.getbase.floatingactionbutton.FloatingActionButton
-                android:id="@+id/activity_navigation_drawer_new_event_floatingActionButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                fab:fab_colorNormal="@color/theme_primary"
-                fab:fab_colorPressed="@color/theme_primary_dark"
-                fab:fab_title="Another one on the right" />
 
-            <com.getbase.floatingactionbutton.FloatingActionButton
-                android:id="@+id/activity_navigation_drawer_new_place_floatingActionButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                fab:fab_colorNormal="@color/theme_primary"
-                fab:fab_colorPressed="@color/theme_primary_dark"
-                fab:fab_title="Another one on the right" />
-        </com.getbase.floatingactionbutton.FloatingActionsMenu>
+        </com.getbase.floatingactionbutton.FloatingActionButton>
+
     </RelativeLayout>
 
 
