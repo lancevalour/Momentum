@@ -28,6 +28,7 @@ import yahoofinance.Stock;
 import yahoofinance.YahooFinance;
 import yicheng.android.app.momentum.R;
 import yicheng.android.app.momentum.adapter.StockRecyclerAdapter;
+import yicheng.android.app.momentum.model.MyStock;
 import yicheng.android.app.momentum.model.Snappy;
 
 /**

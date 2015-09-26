@@ -55,6 +55,7 @@ public class FavoriteRecyclerAdapter extends RecyclerView.Adapter<FavoriteRecycl
         stock = stockList.get(position);
 
         final String name = stock.getName();
+        final String symbol = stock.getSymbol();
         StockQuote quote = stock.getQuote();
         String price = quote.getPrice().toString();
         String priceChange = quote.getChange().toString();
@@ -77,6 +78,7 @@ public class FavoriteRecyclerAdapter extends RecyclerView.Adapter<FavoriteRecycl
             public void onClick(View v) {
                 Intent intent = new Intent("ACTIVITY_STOCK_DETAIL");
                 intent.putExtra("Stock Name", name);
+                intent.putExtra("Stock Symbol", symbol);
                 v.getContext().startActivity(intent);
             }
         });

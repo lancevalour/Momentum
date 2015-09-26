@@ -3,6 +3,7 @@ package yicheng.android.app.momentum.adapter;
 import android.content.Context;
 import android.content.Intent;
 
+import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,9 +21,11 @@ import org.w3c.dom.Text;
 import java.util.List;
 
 import yahoofinance.Stock;
+import yahoofinance.YahooFinance;
 import yahoofinance.quotes.stock.StockQuote;
 import yicheng.android.app.momentum.R;
 
+import yicheng.android.app.momentum.model.MyStock;
 import yicheng.android.app.momentum.model.Snappy;
 
 /**
@@ -101,6 +104,9 @@ public class StockRecyclerAdapter extends RecyclerView.Adapter<StockRecyclerAdap
             public void onClick(View v) {
                 Intent intent = new Intent("ACTIVITY_STOCK_DETAIL");
                 intent.putExtra("Stock Name", name);
+                intent.putExtra("Stock Symbol", symbol);
+
+
                 v.getContext().startActivity(intent);
             }
         });

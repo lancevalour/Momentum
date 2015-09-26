@@ -13,43 +13,80 @@
         android:theme="@style/ToolBarTheme"
         app:popupTheme="@style/Theme.AppCompat.Light.NoActionBar"></android.support.v7.widget.Toolbar>
 
-    <RelativeLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_below="@id/activity_stock_search_toolbar"
-        android:background="?attr/selectableItemBackground"
-        android:padding="10dp">
+        android:scrollbars="vertical">
 
-        <TextView
-            android:id="@+id/activity_stock_search_symbol_textView"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-medium"
-            android:text="Stock Name"
-            android:textColor="@color/color_subheader"
-            android:textSize="34sp" />
-
-        <TextView
-            android:id="@+id/activity_stock_search_price_textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/activity_stock_search_symbol_textView"
-            android:layout_marginTop="5dp"
-            android:fontFamily="sans-serif-medium"
-            android:text="Price"
-            android:textColor="@color/color_subheader"
-            android:textSize="56sp" />
+            android:layout_below="@id/activity_stock_search_toolbar"
+            android:layout_marginBottom="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="10dp"
+            android:background="?attr/selectableItemBackground"
+            android:padding="10dp">
 
 
-        <TextView
-            android:id="@+id/activity_stock_search_price_change_textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/activity_stock_search_price_textView"
-            android:layout_marginTop="5dp"
-            android:fontFamily="sans-serif-medium"
-            android:text="Price Change"
-            android:textColor="@color/color_subheader"
-            android:textSize="24sp" />
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/activity_stock_search_symbol_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:text="GOOGL"
+                android:textColor="@color/color_subheader"
+                android:textSize="36sp" />
+
+            <TextView
+                android:id="@+id/activity_stock_search_price_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/activity_stock_search_symbol_textView"
+                android:layout_marginTop="10dp"
+                android:fontFamily="sans-serif-light"
+                android:text="Price"
+                android:textColor="@color/color_subheader"
+                android:textSize="58sp" />
+
+
+            <TextView
+                android:id="@+id/activity_stock_search_price_change_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/activity_stock_search_price_textView"
+                android:layout_marginTop="10dp"
+                android:fontFamily="sans-serif"
+                android:text="Price Change"
+                android:textColor="@color/color_subheader"
+                android:textSize="26sp" />
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/activity_stock_search_chart"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_below="@id/activity_stock_search_price_change_textView"
+                android:layout_marginTop="25dp" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/activity_stock_search_chart"
+                android:layout_marginTop="25dp"
+                android:layout_marginBottom="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="info" />
+            </RelativeLayout>
+
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+
 </RelativeLayout>

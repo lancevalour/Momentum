@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.snappydb.DB;
 import com.snappydb.KeyIterator;
@@ -29,6 +31,7 @@ import java.util.Map;
 import yahoofinance.Stock;
 import yahoofinance.YahooFinance;
 import yicheng.android.app.momentum.R;
+import yicheng.android.app.momentum.activity.NavigationDrawerActivity;
 import yicheng.android.app.momentum.adapter.FavoriteRecyclerAdapter;
 import yicheng.android.app.momentum.model.Snappy;
 
@@ -46,6 +49,9 @@ public class FavoriteFragment extends Fragment {
 
 
     List<Stock> stockList;
+
+    Stock removedStock;
+    int removedStockPosition;
 
     DB favoriteDB;
 
@@ -90,6 +96,66 @@ public class FavoriteFragment extends Fragment {
 
                     @Override
                     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                        // Toast.makeText(getActivity().getBaseContext(), "" + viewHolder.getAdapterPosition(), Toast.LENGTH_SHORT).show();
+                        removedStockPosition = viewHolder.getAdapterPosition();
+
+                        removedStock = stockList.remove(removedStockPosition);
+                        fragment_favorite_recyclerView.getAdapter().notifyDataSetChanged();
+
+                        try {
+                            favoriteDB = Snappy.open(rootView.getContext(), Snappy.DB_NAME_FAVORITE);
+                            favoriteDB.del(removedStock.getSymbol());
+                            favoriteDB.close();
+
+                        } catch (SnappydbException e) {
+                            e.printStackTrace();
+                        }
+
+                        Snackbar snackBar = Snackbar.make(NavigationDrawerActivity.activity_navigation_drawer_coordinatorLayout, "Favorite Removed", Snackbar.LENGTH_LONG).setAction("Undo", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+
+                                stockList.add(removedStockPosition, removedStock);
+
+                                fragment_favorite_recyclerView.getAdapter().notifyDataSetChanged();
+
+                                try {
+                                    favoriteDB = Snappy.open(rootView.getContext(), Snappy.DB_NAME_FAVORITE);
+                                    favoriteDB.put(removedStock.getSymbol(), removedStock);
+                                    favoriteDB.close();
+
+                                } catch (SnappydbException e) {
+                                    e.printStackTrace();
+                                }
+
+
+                                //  fragment_favorite_recyclerView.setAdapter(new FavoriteRecyclerAdapter(stockList));
+                                Toast.makeText(getActivity().getBaseContext(), "Undo", Toast.LENGTH_SHORT).show();
+                            }
+                        }).setActionTextColor(getResources().getColor(R.color.theme_primary));
+
+                        View view = snackBar.getView();
+                        TextView textView = (TextView)
+                                view.findViewById(android.support.design.R.id.snackbar_text);
+                        textView.setTextColor(Color.WHITE);
+
+                        view.setMinimumHeight(120);
+                        snackBar.show();
+
+                     /*   try {
+
+                            favoriteDB = Snappy.open(rootView.getContext(), Snappy.DB_NAME_FAVORITE);
+                            favoriteDB.del("");
+                            favoriteDB.close();
+
+                        } catch (SnappydbException e) {
+                            e.printStackTrace();
+                        }
+*/
+
+                        //  stockList.remove(viewHolder.getAdapterPosition());
+
+                        // loadStockData();
 
                     }
                 };

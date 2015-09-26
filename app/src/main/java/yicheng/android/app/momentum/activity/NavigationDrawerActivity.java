@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -48,6 +49,8 @@ public class NavigationDrawerActivity extends AppCompatActivity {
 
     NavigationView activity_navigation_drawer_navigation_view;
 
+    public static CoordinatorLayout activity_navigation_drawer_coordinatorLayout;
+
 
     FloatingActionButton activity_navigation_drawer_search_fab;
 
@@ -75,6 +78,7 @@ public class NavigationDrawerActivity extends AppCompatActivity {
         email = (TextView) findViewById(R.id.email);
         email.setText("haha");
 
+        activity_navigation_drawer_coordinatorLayout = (CoordinatorLayout) findViewById(R.id.activity_navigation_drawer_coordinatorLayout);
 
         activity_navigation_drawer_layout = (DrawerLayout) findViewById(R.id.activity_navigation_drawer_layout);
 
@@ -274,8 +278,8 @@ public class NavigationDrawerActivity extends AppCompatActivity {
                 return true;
             }
         })
-    ;
-}
+        ;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
