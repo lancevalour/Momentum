@@ -6,6 +6,8 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 
@@ -14,6 +16,8 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.snappydb.DB;
+import com.snappydb.SnappydbException;
 
 import org.w3c.dom.Text;
 
@@ -31,6 +35,7 @@ import yahoofinance.histquotes.HistoricalQuote;
 import yahoofinance.histquotes.Interval;
 import yicheng.android.app.momentum.R;
 import yicheng.android.app.momentum.adapter.StockRecyclerAdapter;
+import yicheng.android.app.momentum.model.Snappy;
 
 /**
  * Created by ZhangY on 9/17/2015.
@@ -39,11 +44,11 @@ public class StockDetailActivity extends AppCompatActivity {
 
     LineChart activity_stock_detail_chart;
 
+    CheckBox activity_stock_detail_favorite_checkBox;
 
     TextView activity_stock_detail_symbol_textView, activity_stock_detail_price_textView, activity_stock_detail_price_change_textView;
 
     Toolbar activity_stock_detail_toolbar;
-
 
     List<HistoricalQuote> stockHistory;
 
@@ -52,6 +57,8 @@ public class StockDetailActivity extends AppCompatActivity {
     String stockSymbol;
 
     Handler handler;
+
+    DB favoriteDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +83,7 @@ public class StockDetailActivity extends AppCompatActivity {
 
         activity_stock_detail_symbol_textView.setText(stockSymbol);
         activity_stock_detail_price_textView.setText(stock.getQuote().getPrice().toString());
-        activity_stock_detail_price_change_textView.setText(stock.getQuote().getChangeInPercent().toString());
+        activity_stock_detail_price_change_textView.setText(stock.getQuote().getChange().toString() + "   " + stock.getQuote().getChangeInPercent().toString() + "%");
 
 
     }
@@ -171,6 +178,20 @@ public class StockDetailActivity extends AppCompatActivity {
     private void initiateComponent() {
         activity_stock_detail_chart = (LineChart) findViewById(R.id.activity_stock_detail_chart);
 
+        activity_stock_detail_favorite_checkBox = (CheckBox) findViewById(R.id.activity_stock_detail_favorite_checkBox);
+
+        try {
+            favoriteDB = Snappy.open(getBaseContext(), Snappy.DB_NAME_FAVORITE);
+            if (favoriteDB.exists(stockSymbol)) {
+                activity_stock_detail_favorite_checkBox.setChecked(true);
+            } else {
+                activity_stock_detail_favorite_checkBox.setChecked(false);
+            }
+            favoriteDB.close();
+
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
 
         activity_stock_detail_symbol_textView = (TextView) findViewById(R.id.activity_stock_detail_symbol_textView);
         activity_stock_detail_price_textView = (TextView) findViewById(R.id.activity_stock_detail_price_textView);
@@ -189,6 +210,34 @@ public class StockDetailActivity extends AppCompatActivity {
 
     private void setComponentControl() {
         setToolbarNavigationControl();
+        setFavoriteCheckBoxControl();
+    }
+
+    private void setFavoriteCheckBoxControl() {
+        activity_stock_detail_favorite_checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    try {
+                        favoriteDB = Snappy.open(getBaseContext(), Snappy.DB_NAME_FAVORITE);
+                        favoriteDB.put(stockSymbol, stock);
+                        favoriteDB.close();
+
+                    } catch (SnappydbException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    try {
+                        favoriteDB = Snappy.open(getBaseContext(), Snappy.DB_NAME_FAVORITE);
+                        favoriteDB.del(stockSymbol);
+                        favoriteDB.close();
+
+                    } catch (SnappydbException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
     }
 
     private void setToolbarNavigationControl() {

@@ -35,7 +35,6 @@ public class StockRecyclerAdapter extends RecyclerView.Adapter<StockRecyclerAdap
 
     List<Stock> stockList;
 
-
     Context context;
 
     View itemView;
@@ -43,7 +42,6 @@ public class StockRecyclerAdapter extends RecyclerView.Adapter<StockRecyclerAdap
     Stock stock;
 
     DB favoriteDB;
-
 
     public StockRecyclerAdapter(List<Stock> stockList) {
         this.stockList = stockList;
