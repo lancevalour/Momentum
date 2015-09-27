@@ -14,11 +14,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.support.v7.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -28,10 +34,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 import java.util.Map;
 
 import yahoofinance.Stock;
 import yahoofinance.YahooFinance;
+import yahoofinance.histquotes.HistoricalQuote;
+import yahoofinance.histquotes.Interval;
 import yicheng.android.app.momentum.R;
 import yicheng.android.app.momentum.adapter.StockRecyclerAdapter;
 
@@ -40,11 +51,13 @@ import yicheng.android.app.momentum.adapter.StockRecyclerAdapter;
  */
 public class StockSearchActivity extends AppCompatActivity {
 
-    TextView activity_stock_search_symbol_textView, activity_stock_search_price_textView, activity_stock_search_price_change_textView;
+    LineChart activity_stock_search_chart;
 
+    TextView activity_stock_search_symbol_textView, activity_stock_search_price_textView, activity_stock_search_price_change_textView;
 
     Toolbar activity_stock_search_toolbar;
 
+    List<HistoricalQuote> stockHistory;
 
     SimpleCursorAdapter cursorAdapter;
 
@@ -52,10 +65,9 @@ public class StockSearchActivity extends AppCompatActivity {
 
     Handler handler;
 
-
-    String stockSymbol;
-
     Stock stock;
+    String stockSymbol;
+    String stockName;
 
 
     @Override
@@ -67,6 +79,31 @@ public class StockSearchActivity extends AppCompatActivity {
         setHandlerControl();
         initiateComponent();
         setComponentControl();
+    }
+
+    private void updateStockChart() {
+        ArrayList<Entry> valsComp1 = new ArrayList<Entry>();
+
+
+        for (int i = 0; i < stockHistory.size(); i++) {
+            valsComp1.add(new Entry(stockHistory.get(i).getClose().floatValue(), i));
+        }
+
+
+        LineDataSet setComp1 = new LineDataSet(valsComp1, "Price");
+        setComp1.setAxisDependency(YAxis.AxisDependency.LEFT);
+
+        ArrayList<LineDataSet> dataSets = new ArrayList<LineDataSet>();
+        dataSets.add(setComp1);
+
+        ArrayList<String> xVals = new ArrayList<String>();
+        for (int i = 0; i < stockHistory.size(); i++) {
+            xVals.add("" + i);
+        }
+
+
+        activity_stock_search_chart.setData(new LineData(xVals, dataSets));
+        activity_stock_search_chart.invalidate();
     }
 
 
@@ -83,6 +120,11 @@ public class StockSearchActivity extends AppCompatActivity {
                         updateStockUI();
                     }
                     break;
+                    case 3: {
+                        updateStockChart();
+                    }
+                    break;
+
 
                 }
             }
@@ -95,6 +137,9 @@ public class StockSearchActivity extends AppCompatActivity {
     }
 
     private void initiateComponent() {
+        activity_stock_search_chart = (LineChart) findViewById(R.id.activity_stock_search_chart);
+
+
         activity_stock_search_symbol_textView = (TextView) findViewById(R.id.activity_stock_search_symbol_textView);
         activity_stock_search_price_textView = (TextView) findViewById(R.id.activity_stock_search_price_textView);
         activity_stock_search_price_change_textView = (TextView) findViewById(R.id.activity_stock_search_price_change_textView);
@@ -129,10 +174,12 @@ public class StockSearchActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.search, menu);
 
+        MenuItem menuItem = menu.findItem(R.id.actionbar_search);
+
         SearchManager searchManager =
                 (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView =
-                (SearchView) menu.findItem(R.id.actionbar_search).getActionView();
+                (SearchView) menuItem.getActionView();
         searchView.setSearchableInfo(
                 searchManager.getSearchableInfo(getComponentName()));
 
@@ -159,7 +206,7 @@ public class StockSearchActivity extends AppCompatActivity {
             public boolean onSuggestionClick(int i) {
                 matrixCursor.moveToPosition(i);
 
-               stockSymbol = matrixCursor.getString(matrixCursor
+                stockSymbol = matrixCursor.getString(matrixCursor
                         .getColumnIndex("stockSymbol"));
 
                 loadStockInfo();
@@ -186,11 +233,13 @@ public class StockSearchActivity extends AppCompatActivity {
             }
         });
 
+        menuItem.expandActionView();
+
         return true;
     }
 
 
-    private void updateStockUI(){
+    private void updateStockUI() {
 
         activity_stock_search_symbol_textView.setText(stockSymbol);
         activity_stock_search_price_textView.setText(stock.getQuote().getPrice().toString());
@@ -213,6 +262,18 @@ public class StockSearchActivity extends AppCompatActivity {
                             Message msg = Message.obtain();
                             msg.what = 2;
                             handler.sendMessage(msg);
+
+
+                            Calendar from = Calendar.getInstance();
+                            Calendar to = Calendar.getInstance();
+                            from.add(Calendar.YEAR, -2);
+
+                            stockHistory = stock.getHistory(from, to, Interval.MONTHLY);
+
+                            msg = Message.obtain();
+                            msg.what = 3;
+                            handler.sendMessage(msg);
+
 
                         } catch (IOException e) {
                             e.printStackTrace();
