@@ -1,7 +1,9 @@
 package yicheng.android.app.momentum.activity;
 
+import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.MatrixCursor;
 import android.os.Bundle;
 import android.os.Handler;
@@ -17,8 +19,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.support.v7.widget.SearchView;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,6 +46,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -55,6 +62,13 @@ import yicheng.android.app.momentum.model.Snappy;
  * Created by ZhangY on 9/21/2015.
  */
 public class StockSearchActivity extends AppCompatActivity {
+    Button activity_stock_search_buy_button, activity_stock_search_sell_button;
+
+
+    ProgressBar activity_stock_search_progressBar, activity_stock_search_chart_progressBar;
+
+
+    ScrollView activity_stock_search_scrollView;
 
     LineChart activity_stock_search_chart;
 
@@ -77,6 +91,10 @@ public class StockSearchActivity extends AppCompatActivity {
     String stockName;
 
     DB favoriteDB;
+    DB portfolioDB;
+
+    double buyPrice;
+    int buyShares;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,10 +144,14 @@ public class StockSearchActivity extends AppCompatActivity {
                     break;
                     case 2: {
                         updateStockUI();
+                        activity_stock_search_scrollView.setVisibility(View.VISIBLE);
+                        activity_stock_search_progressBar.setVisibility(View.INVISIBLE);
+                        activity_stock_search_chart_progressBar.setVisibility(View.VISIBLE);
                     }
                     break;
                     case 3: {
                         updateStockChart();
+                        activity_stock_search_chart_progressBar.setVisibility(View.INVISIBLE);
                     }
                     break;
 
@@ -145,6 +167,17 @@ public class StockSearchActivity extends AppCompatActivity {
     }
 
     private void initiateComponent() {
+        activity_stock_search_buy_button = (Button) findViewById(R.id.activity_stock_search_buy_button);
+        activity_stock_search_sell_button = (Button) findViewById(R.id.activity_stock_search_sell_button);
+
+        activity_stock_search_progressBar = (ProgressBar) findViewById(R.id.activity_stock_search_progressBar);
+        activity_stock_search_progressBar.setVisibility(View.VISIBLE);
+        activity_stock_search_chart_progressBar = (ProgressBar) findViewById(R.id.activity_stock_search_chart_progressBar);
+        activity_stock_search_chart_progressBar.setVisibility(View.INVISIBLE);
+
+        activity_stock_search_scrollView = (ScrollView) findViewById(R.id.activity_stock_search_scrollView);
+        activity_stock_search_scrollView.setVisibility(View.INVISIBLE);
+
         activity_stock_search_chart = (LineChart) findViewById(R.id.activity_stock_search_chart);
 
         activity_stock_search_favorite_checkBox = (CheckBox) findViewById(R.id.activity_stock_search_favorite_checkBox);
@@ -167,6 +200,76 @@ public class StockSearchActivity extends AppCompatActivity {
     private void setComponentControl() {
         setToolbarNavigationControl();
         setFavoriteCheckBoxControl();
+        setBuyButtonControl();
+        setSellButtonControl();
+    }
+
+    private void setBuyButtonControl() {
+        activity_stock_search_buy_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                AlertDialog.Builder dialogbuilder = new AlertDialog.Builder(StockSearchActivity.this);
+
+                dialogbuilder.setTitle("Buy");
+
+                View dialogView = getLayoutInflater().inflate(R.layout.dialog_buy, null);
+
+                dialogbuilder.setView(dialogView);
+
+
+                final EditText buyPriceEditText = (EditText) dialogView.findViewById(R.id.dialog_buy_price_editText);
+                final EditText buySharesEditText = (EditText) dialogView.findViewById(R.id.dialog_buy_shares_editText);
+
+
+                dialogbuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (buyPriceEditText.getText().toString().trim().equals("") || buySharesEditText.getText().toString().trim().equals("")) {
+                            Toast.makeText(getBaseContext(), "Price or shares can't be nothing.", Toast.LENGTH_SHORT).show();
+                        } else {
+
+                            buyPrice = Double.parseDouble(buyPriceEditText.getText().toString());
+                            buyShares = Integer.parseInt(buySharesEditText.getText().toString());
+
+
+                            try {
+                                portfolioDB = Snappy.open(getBaseContext(), Snappy.DB_NAME_PORTFOLIO);
+                                favoriteDB.put(stockSymbol, new Object[]{stock, buyPrice, buyShares});
+                                favoriteDB.close();
+
+                            } catch (SnappydbException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                });
+
+                dialogbuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                AlertDialog dialog = dialogbuilder.create();
+                dialog.show();
+
+                dialog.getButton(dialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.theme_accent));
+                dialog.getButton(dialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.theme_primary));
+
+
+            }
+        });
+    }
+
+    private void setSellButtonControl() {
+        activity_stock_search_sell_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
     }
 
     private void setFavoriteCheckBoxControl() {
@@ -319,6 +422,7 @@ public class StockSearchActivity extends AppCompatActivity {
                             from.add(Calendar.YEAR, -2);
 
                             stockHistory = stock.getHistory(from, to, Interval.MONTHLY);
+                            Collections.reverse(stockHistory);
 
                             msg = Message.obtain();
                             msg.what = 3;

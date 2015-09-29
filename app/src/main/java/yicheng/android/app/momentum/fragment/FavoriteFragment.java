@@ -14,6 +14,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,6 +41,9 @@ import yicheng.android.app.momentum.model.Snappy;
  */
 public class FavoriteFragment extends Fragment {
     ViewGroup rootView;
+
+    ProgressBar fragment_favorite_progressBar;
+
 
     RecyclerView fragment_favorite_recyclerView;
 
@@ -79,6 +83,9 @@ public class FavoriteFragment extends Fragment {
     }
 
     private void initiateComponents() {
+        fragment_favorite_progressBar = (ProgressBar) rootView.findViewById(R.id.fragment_favorite_progressBar);
+        fragment_favorite_progressBar.setVisibility(View.VISIBLE);
+
         fragment_favorite_recyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_favorite_recyclerView);
 
 
@@ -174,6 +181,8 @@ public class FavoriteFragment extends Fragment {
             public void handleMessage(Message msg) {
                 switch (msg.what) {
                     case 1: {
+                        fragment_favorite_progressBar.setVisibility(View.INVISIBLE);
+
                         if (stockList.size() == 0) {
                             fragment_favorite_textView.setVisibility(View.VISIBLE);
 
@@ -191,9 +200,30 @@ public class FavoriteFragment extends Fragment {
             }
         };
     }
+    String[] keys;
 
     private void loadStockData() {
         stockList = new ArrayList<Stock>();
+
+
+        try {
+
+            if (favoriteDB == null) {
+                favoriteDB = Snappy.open(rootView.getContext(), Snappy.DB_NAME_FAVORITE);
+            }
+            KeyIterator keyIt = favoriteDB.allKeysIterator();
+            if (keyIt.hasNext()) {
+                keys = keyIt.next(10000);
+                System.out.println(Arrays.toString(keys));
+            }
+            keyIt.close();
+            favoriteDB.close();
+
+
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+
 
         getActivity().runOnUiThread(new Runnable() {
 
@@ -205,22 +235,6 @@ public class FavoriteFragment extends Fragment {
                     public void run() {
                         try {
 
-                            String[] keys = null;
-
-                            try {
-
-                                favoriteDB = Snappy.open(rootView.getContext(), Snappy.DB_NAME_FAVORITE);
-                                KeyIterator keyIt = favoriteDB.allKeysIterator();
-                                if (keyIt.hasNext()) {
-                                    keys = keyIt.next(10000);
-                                    System.out.println(Arrays.toString(keys));
-                                }
-                                keyIt.close();
-                                favoriteDB.close();
-
-                            } catch (SnappydbException e) {
-                                e.printStackTrace();
-                            }
 
 
                             if (keys != null) {

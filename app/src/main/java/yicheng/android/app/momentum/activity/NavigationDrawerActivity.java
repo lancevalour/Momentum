@@ -2,6 +2,7 @@ package yicheng.android.app.momentum.activity;
 
 import android.app.Fragment;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
@@ -58,18 +59,29 @@ public class NavigationDrawerActivity extends AppCompatActivity {
 
     TextView email;
 
-
     private final Handler drawerActionHandler = new Handler();
 
     private static final long DRAWER_CLOSE_DELAY_MS = 250;
 
     int curDrawerItemId;
+    String DRAWER_ID = "drawer_id";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation_drawer);
+
+        if (null == savedInstanceState) {
+            curDrawerItemId = R.id.drawer_market;
+        } else {
+            curDrawerItemId = savedInstanceState.getInt(DRAWER_ID);
+        }
+
+
         initiateComponents();
+
+
         setComponentControl();
 
     }
@@ -92,7 +104,7 @@ public class NavigationDrawerActivity extends AppCompatActivity {
         activity_navigation_drawer_navigation_view = (NavigationView) findViewById(R.id.activity_navigation_drawer_navigation_view);
 
 
-        activity_navigation_drawer_navigation_view.getMenu().findItem(R.id.drawer_market).setChecked(true);
+        activity_navigation_drawer_navigation_view.getMenu().findItem(curDrawerItemId).setChecked(true);
 
 
         activity_navigation_drawer_search_fab = (FloatingActionButton) findViewById(R.id.activity_navigation_drawer_search_fab);
@@ -122,9 +134,6 @@ public class NavigationDrawerActivity extends AppCompatActivity {
         };
         activity_navigation_drawer_layout.setDrawerListener(drawerToggle);
         drawerToggle.syncState();
-
-
-        curDrawerItemId = R.id.drawer_market;
 
         navigate(curDrawerItemId);
 
@@ -281,6 +290,7 @@ public class NavigationDrawerActivity extends AppCompatActivity {
         ;
     }
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -291,4 +301,19 @@ public class NavigationDrawerActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onBackPressed() {
+        if (activity_navigation_drawer_layout.isDrawerOpen(GravityCompat.START)) {
+            activity_navigation_drawer_layout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+
+    @Override
+    protected void onSaveInstanceState(final Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(this.DRAWER_ID, curDrawerItemId);
+    }
 }

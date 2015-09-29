@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import com.snappydb.DB;
 import com.snappydb.SnappydbException;
@@ -36,6 +37,8 @@ import yicheng.android.app.momentum.model.Snappy;
  */
 public class MarketFragment extends Fragment {
     ViewGroup rootView;
+
+    ProgressBar fragment_market_progressBar;
 
     SwipeRefreshLayout fragment_market_refreshLayout;
 
@@ -75,9 +78,13 @@ public class MarketFragment extends Fragment {
             public void handleMessage(Message msg) {
                 switch (msg.what) {
                     case 1: {
+                        fragment_market_progressBar.setVisibility(View.INVISIBLE);
+
                         if (fragment_market_refreshLayout.isRefreshing()) {
                             fragment_market_refreshLayout.setRefreshing(false);
                         }
+
+
                         fragment_market_recyclerView.setAdapter(new StockRecyclerAdapter(stockList));
 
                     }
@@ -126,6 +133,9 @@ public class MarketFragment extends Fragment {
 
 
     private void initiateComponents() {
+        fragment_market_progressBar = (ProgressBar) rootView.findViewById(R.id.fragment_market_progressBar);
+        fragment_market_progressBar.setVisibility(View.VISIBLE);
+
         fragment_market_recyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_market_recyclerView);
 
 

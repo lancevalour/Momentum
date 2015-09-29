@@ -11,6 +11,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.snappydb.DB;
@@ -34,6 +35,8 @@ import yicheng.android.app.momentum.model.Snappy;
  */
 public class PortfolioFragment extends Fragment {
     ViewGroup rootView;
+
+    ProgressBar fragment_portfolio_progressBar;
 
     RecyclerView fragment_portfolio_recyclerView;
 
@@ -71,6 +74,8 @@ public class PortfolioFragment extends Fragment {
             public void handleMessage(Message msg) {
                 switch (msg.what) {
                     case 1: {
+                        fragment_portfolio_progressBar.setVisibility(View.INVISIBLE);
+
                         if (stockList.size() == 0) {
                             fragment_portfolio_textView.setVisibility(View.VISIBLE);
 
@@ -108,7 +113,6 @@ public class PortfolioFragment extends Fragment {
                             String[] keys = null;
 
                             try {
-
                                 portfolioDB = Snappy.open(rootView.getContext(), Snappy.DB_NAME_PORTFOLIO);
                                 KeyIterator keyIt = portfolioDB.allKeysIterator();
                                 if (keyIt.hasNext()) {
@@ -143,6 +147,9 @@ public class PortfolioFragment extends Fragment {
     }
 
     private void initiateComponents() {
+        fragment_portfolio_progressBar = (ProgressBar) rootView.findViewById(R.id.fragment_portfolio_progressBar);
+        fragment_portfolio_progressBar.setVisibility(View.VISIBLE);
+
         fragment_portfolio_recyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_portfolio_recyclerView);
 
 
