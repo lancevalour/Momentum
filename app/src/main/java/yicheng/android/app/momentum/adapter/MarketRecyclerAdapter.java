@@ -3,7 +3,6 @@ package yicheng.android.app.momentum.adapter;
 import android.content.Context;
 import android.content.Intent;
 
-import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,22 +15,18 @@ import com.snappydb.DB;
 
 import com.snappydb.SnappydbException;
 
-import org.w3c.dom.Text;
-
 import java.util.List;
 
 import yahoofinance.Stock;
-import yahoofinance.YahooFinance;
 import yahoofinance.quotes.stock.StockQuote;
 import yicheng.android.app.momentum.R;
 
-import yicheng.android.app.momentum.model.MyStock;
 import yicheng.android.app.momentum.model.Snappy;
 
 /**
  * Created by ZhangY on 8/24/2015.
  */
-public class StockRecyclerAdapter extends RecyclerView.Adapter<StockRecyclerAdapter.ViewHolder> {
+public class MarketRecyclerAdapter extends RecyclerView.Adapter<MarketRecyclerAdapter.ViewHolder> {
 
     List<Stock> stockList;
 
@@ -43,14 +38,14 @@ public class StockRecyclerAdapter extends RecyclerView.Adapter<StockRecyclerAdap
 
     DB favoriteDB;
 
-    public StockRecyclerAdapter(List<Stock> stockList) {
+    public MarketRecyclerAdapter(List<Stock> stockList) {
         this.stockList = stockList;
     }
 
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_item_stock, parent, false);
+        itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_item_market, parent, false);
 
         context = parent.getContext();
 
@@ -91,8 +86,9 @@ public class StockRecyclerAdapter extends RecyclerView.Adapter<StockRecyclerAdap
 
 
         if (priceChangePercent.substring(0, 1).equals("-")) {
-            holder.recycler_item_stock_price_change_textView.setTextColor(context.getResources().getColor(R.color.theme_accent));
+            holder.recycler_item_stock_price_change_textView.setTextColor(context.getResources().getColor(R.color.theme_red));
         } else {
+            holder.recycler_item_stock_price_change_textView.setText("+" + priceChange + " " + priceChangePercent + "%");
             holder.recycler_item_stock_price_change_textView.setTextColor(context.getResources().getColor(R.color.theme_primary));
         }
 

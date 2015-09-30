@@ -5,8 +5,11 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -26,23 +29,17 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.snappydb.DB;
 import com.snappydb.SnappydbException;
 
-import org.w3c.dom.Text;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
-import me.imid.swipebacklayout.lib.SwipeBackLayout;
-import me.imid.swipebacklayout.lib.app.SwipeBackActivity;
 import yahoofinance.Stock;
 import yahoofinance.YahooFinance;
 import yahoofinance.histquotes.HistoricalQuote;
 import yahoofinance.histquotes.Interval;
 import yicheng.android.app.momentum.R;
-import yicheng.android.app.momentum.adapter.StockRecyclerAdapter;
 import yicheng.android.app.momentum.model.Snappy;
 
 /**
@@ -59,7 +56,11 @@ public class StockDetailActivity extends AppCompatActivity {
 
     CheckBox activity_stock_detail_favorite_checkBox;
 
-    TextView activity_stock_detail_symbol_textView, activity_stock_detail_price_textView, activity_stock_detail_price_change_textView;
+    TextView activity_stock_detail_symbol_textView,
+            activity_stock_detail_price_textView,
+            activity_stock_detail_price_change_textView,
+            activity_stock_detail_total_value_textView,
+            activity_stock_detail_total_value_change_textView;
 
     Toolbar activity_stock_detail_toolbar;
 
@@ -76,8 +77,8 @@ public class StockDetailActivity extends AppCompatActivity {
     DB portfolioDB;
 
     double buyPrice;
-    int buyShares;
-
+    double buyShares;
+    double buyTotal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,12 +98,74 @@ public class StockDetailActivity extends AppCompatActivity {
         setComponentControl();
     }
 
+
     private void updateStockUI() {
 
-
         activity_stock_detail_symbol_textView.setText(stockSymbol);
-        activity_stock_detail_price_textView.setText(stock.getQuote().getPrice().toString());
-        activity_stock_detail_price_change_textView.setText(stock.getQuote().getChange().toString() + "   " + stock.getQuote().getChangeInPercent().toString() + "%");
+        String price = stock.getQuote().getPrice().toString();
+        activity_stock_detail_price_textView.setText(price);
+        String priceChange = stock.getQuote().getChange().toString() + "   "
+                + stock.getQuote().getChangeInPercent().toString() + "%";
+        activity_stock_detail_price_change_textView.setText(priceChange);
+
+        if (priceChange.substring(0, 1).equals("-")) {
+            activity_stock_detail_price_change_textView.setTextColor(getBaseContext().getResources().getColor(R.color.theme_red));
+        } else {
+            activity_stock_detail_price_change_textView.setText("+" + priceChange);
+            activity_stock_detail_price_change_textView.setTextColor(getBaseContext().getResources().getColor(R.color.theme_primary));
+        }
+
+        updateValueUI();
+
+
+    }
+
+    private void updateValueUI() {
+        boolean isStockInPortfolio = false;
+        try {
+            portfolioDB = Snappy.open(getBaseContext(), Snappy.DB_NAME_PORTFOLIO);
+            isStockInPortfolio = portfolioDB.exists(stockSymbol);
+            portfolioDB.close();
+
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+
+        if (isStockInPortfolio) {
+            activity_stock_detail_total_value_textView.setVisibility(View.VISIBLE);
+            activity_stock_detail_total_value_change_textView.setVisibility(View.VISIBLE);
+            activity_stock_detail_sell_button.setVisibility(View.VISIBLE);
+
+            Double[] value = null;
+            try {
+                portfolioDB = Snappy.open(getBaseContext(), Snappy.DB_NAME_PORTFOLIO);
+                value = portfolioDB.getObjectArray(stockSymbol, Double.class);
+                portfolioDB.close();
+
+            } catch (SnappydbException e) {
+                e.printStackTrace();
+            }
+
+            String totalValue = String.valueOf(value[2] * stock.getQuote().getPrice().doubleValue());
+
+            activity_stock_detail_total_value_textView.setText(totalValue);
+
+            String valueChange = String.valueOf((stock.getQuote().getPrice().doubleValue() - value[0]) * value[2]);
+            activity_stock_detail_total_value_change_textView.setText(valueChange);
+
+            if (activity_stock_detail_total_value_change_textView.getText().toString().substring(0, 1).equals("-")) {
+                activity_stock_detail_total_value_change_textView.setTextColor(getBaseContext().getResources().getColor(R.color.theme_red));
+            } else {
+                activity_stock_detail_total_value_change_textView.setText("+" + valueChange);
+                activity_stock_detail_total_value_change_textView.setTextColor(getBaseContext().getResources().getColor(R.color.theme_primary));
+            }
+
+
+        } else {
+            activity_stock_detail_total_value_textView.setVisibility(View.INVISIBLE);
+            activity_stock_detail_total_value_change_textView.setVisibility(View.INVISIBLE);
+            activity_stock_detail_sell_button.setVisibility(View.INVISIBLE);
+        }
 
 
     }
@@ -232,6 +295,8 @@ public class StockDetailActivity extends AppCompatActivity {
         activity_stock_detail_price_textView = (TextView) findViewById(R.id.activity_stock_detail_price_textView);
         activity_stock_detail_price_change_textView = (TextView) findViewById(R.id.activity_stock_detail_price_change_textView);
 
+        activity_stock_detail_total_value_textView = (TextView) findViewById(R.id.activity_stock_detail_total_value_textView);
+        activity_stock_detail_total_value_change_textView = (TextView) findViewById(R.id.activity_stock_detail_total_value_change_textView);
 
         activity_stock_detail_toolbar = (Toolbar) findViewById(R.id.activity_stock_detail_toolbar);
         activity_stock_detail_toolbar
@@ -264,30 +329,90 @@ public class StockDetailActivity extends AppCompatActivity {
                 dialogbuilder.setView(dialogView);
 
 
-                final EditText buyPriceEditText = (EditText) dialogView.findViewById(R.id.dialog_buy_price_editText);
-                final EditText buySharesEditText = (EditText) dialogView.findViewById(R.id.dialog_buy_shares_editText);
+                final TextInputLayout dialog_buy_total_layout = (TextInputLayout) dialogView.findViewById(R.id.dialog_buy_total_layout);
+                final TextInputLayout dialog_buy_price_layout = (TextInputLayout) dialogView.findViewById(R.id.dialog_buy_price_layout);
+                final TextInputLayout dialog_buy_shares_layout = (TextInputLayout) dialogView.findViewById(R.id.dialog_buy_shares_layout);
 
+                final EditText buyPriceEditText = dialog_buy_price_layout.getEditText();
+                final EditText buySharesEditText = dialog_buy_shares_layout.getEditText();
+                final EditText totalEditText = dialog_buy_total_layout.getEditText();
+
+/*
+
+                buyPriceEditText.getBackground().setColorFilter(getResources().getColor(R.color.theme_primary), PorterDuff.Mode.SRC_ATOP);
+                buySharesEditText.getBackground().setColorFilter(getResources().getColor(R.color.theme_primary), PorterDuff.Mode.SRC_ATOP);
+                totalEditText.getBackground().setColorFilter(getResources().getColor(R.color.theme_primary), PorterDuff.Mode.SRC_ATOP);
+*/
+
+                totalEditText.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        if (s.toString().trim().length() > 0) {
+                            buySharesEditText.setEnabled(false);
+                        } else {
+                            buySharesEditText.setEnabled(true);
+                        }
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+
+                    }
+                });
+
+                buySharesEditText.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        if (s.toString().trim().length() > 0) {
+                            totalEditText.setEnabled(false);
+                        } else {
+                            totalEditText.setEnabled(true);
+                        }
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+
+                    }
+                });
 
                 dialogbuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
-                        if (buyPriceEditText.getText().toString().trim().equals("") || buySharesEditText.getText().toString().trim().equals("")) {
-                            Toast.makeText(getBaseContext(), "Price or shares can't be nothing.", Toast.LENGTH_SHORT).show();
+                        if (buyPriceEditText.getText().toString().trim().equals("") ||
+                                (buySharesEditText.getText().toString().trim().equals("")
+                                        && totalEditText.getText().toString().trim().equals(""))
+                                ) {
+                            Toast.makeText(getBaseContext(), "One of info is empty.", Toast.LENGTH_SHORT).show();
                         } else {
 
                             buyPrice = Double.parseDouble(buyPriceEditText.getText().toString());
-                            buyShares = Integer.parseInt(buySharesEditText.getText().toString());
-
+                            buyTotal = Double.parseDouble(totalEditText.getText().toString());
+                            buyShares = buyTotal / buyPrice;
 
                             try {
                                 portfolioDB = Snappy.open(getBaseContext(), Snappy.DB_NAME_PORTFOLIO);
-                                favoriteDB.put(stockSymbol, new Object[]{stock, buyPrice, buyShares});
-                                favoriteDB.close();
+                                portfolioDB.put(stockSymbol, new Double[]{buyPrice, buyTotal, buyShares});
+                                portfolioDB.close();
+
 
                             } catch (SnappydbException e) {
                                 e.printStackTrace();
                             }
+
+                            updateValueUI();
+
                         }
 
 
@@ -306,7 +431,7 @@ public class StockDetailActivity extends AppCompatActivity {
                 dialog.show();
 
                 dialog.getButton(dialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.theme_accent));
-                dialog.getButton(dialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.theme_primary));
+                dialog.getButton(dialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.theme_accent));
 
 
             }

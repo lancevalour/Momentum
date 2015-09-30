@@ -1,7 +1,6 @@
 package yicheng.android.app.momentum.fragment;
 
 import android.app.Fragment;
-import android.app.PendingIntent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,15 +9,12 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.snappydb.DB;
-import com.snappydb.SnappydbException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,9 +24,7 @@ import java.util.Map;
 import yahoofinance.Stock;
 import yahoofinance.YahooFinance;
 import yicheng.android.app.momentum.R;
-import yicheng.android.app.momentum.adapter.StockRecyclerAdapter;
-import yicheng.android.app.momentum.model.MyStock;
-import yicheng.android.app.momentum.model.Snappy;
+import yicheng.android.app.momentum.adapter.MarketRecyclerAdapter;
 
 /**
  * Created by ZhangY on 9/16/2015.
@@ -85,7 +79,7 @@ public class MarketFragment extends Fragment {
                         }
 
 
-                        fragment_market_recyclerView.setAdapter(new StockRecyclerAdapter(stockList));
+                        fragment_market_recyclerView.setAdapter(new MarketRecyclerAdapter(stockList));
 
                     }
                     break;

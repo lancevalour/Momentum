@@ -62,8 +62,9 @@ public class PortfolioRecyclerAdapter extends RecyclerView.Adapter<PortfolioRecy
 
 
         if (priceChangePercent.substring(0, 1).equals("-")) {
-            holder.recycler_item_portfolio_price_change_textView.setTextColor(context.getResources().getColor(R.color.theme_accent));
+            holder.recycler_item_portfolio_price_change_textView.setTextColor(context.getResources().getColor(R.color.theme_red));
         } else {
+            holder.recycler_item_portfolio_price_change_textView.setText("+" + priceChange + " " + priceChangePercent + "%");
             holder.recycler_item_portfolio_price_change_textView.setTextColor(context.getResources().getColor(R.color.theme_primary));
         }
 

@@ -24,33 +24,71 @@
             android:textColor="@color/color_subheader"
             android:textSize="24sp" />
 
-        <TextView
-            android:id="@+id/recycler_item_portfolio_price_textView"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:id="@+id/recycler_item_portfolio_price_layout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/recycler_item_portfolio_name_textView"
-            android:layout_marginTop="5dp"
-            android:fontFamily="sans-serif-medium"
-            android:text="Price"
-            android:textColor="@color/color_subheader"
-            android:textSize="18sp" />
+            android:layout_marginTop="5dp">
 
+            <TextView
+                android:id="@+id/recycler_item_portfolio_price_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:fontFamily="sans-serif-medium"
 
-        <TextView
-            android:id="@+id/recycler_item_portfolio_price_change_textView"
-            android:layout_width="wrap_content"
+                android:text="Price"
+                android:textColor="@color/color_subheader"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/recycler_item_portfolio_total_value_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:fontFamily="sans-serif-medium"
+                android:text="Total Value"
+                android:textColor="@color/color_subheader"
+                android:textSize="18sp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/recycler_item_portfolio_price_change_layout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/recycler_item_portfolio_price_textView"
-            android:layout_marginTop="5dp"
-            android:fontFamily="sans-serif-medium"
-            android:text="Price Change"
-            android:textColor="@color/color_subheader"
-            android:textSize="18sp" />
+            android:layout_below="@+id/recycler_item_portfolio_price_layout"
+            android:layout_marginTop="5dp">
+
+            <TextView
+                android:id="@+id/recycler_item_portfolio_price_change_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:fontFamily="sans-serif-medium"
+                android:text="Price Change"
+                android:textColor="@color/color_subheader"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/recycler_item_portfolio_total_value_change_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:fontFamily="sans-serif-medium"
+                android:text="Total Value Change"
+                android:textColor="@color/color_subheader"
+                android:textSize="18sp" />
+
+        </RelativeLayout>
+
 
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="35dp"
-            android:layout_below="@id/recycler_item_portfolio_price_change_textView"
+            android:layout_below="@id/recycler_item_portfolio_price_change_layout"
             android:layout_marginTop="5dp">
 
 

@@ -55,35 +55,76 @@
 
             </RelativeLayout>
 
-
-            <TextView
-                android:id="@+id/activity_stock_detail_price_textView"
-                android:layout_width="wrap_content"
+            <RelativeLayout
+                android:id="@+id/activity_stock_detail_price_layout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/activity_stock_detail_symbol_layout"
-                android:layout_marginTop="10dp"
-                android:fontFamily="sans-serif-light"
-                android:text="Price"
-                android:textColor="@color/color_subheader"
-                android:textSize="58sp" />
+                android:layout_marginTop="10dp">
 
+                <TextView
+                    android:id="@+id/activity_stock_detail_price_textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:fontFamily="sans-serif-light"
+                    android:text="Price"
+                    android:textColor="@color/color_subheader"
+                    android:textSize="58sp" />
 
-            <TextView
-                android:id="@+id/activity_stock_detail_price_change_textView"
-                android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/activity_stock_detail_total_value_textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+
+                    android:fontFamily="sans-serif-light"
+                    android:text="Total Value"
+                    android:textColor="@color/color_subheader"
+                    android:textSize="58sp" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/activity_stock_detail_price_change_layout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/activity_stock_detail_price_textView"
-                android:layout_marginTop="10dp"
-                android:fontFamily="sans-serif"
-                android:text="Price Change"
-                android:textColor="@color/color_subheader"
-                android:textSize="26sp" />
+                android:layout_below="@+id/activity_stock_detail_price_layout"
+                android:layout_marginTop="10dp">
+
+                <TextView
+                    android:id="@+id/activity_stock_detail_price_change_textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+
+                    android:fontFamily="sans-serif"
+                    android:text="Price Change"
+                    android:textColor="@color/color_subheader"
+                    android:textSize="26sp" />
+
+                <TextView
+                    android:id="@+id/activity_stock_detail_total_value_change_textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+
+                    android:fontFamily="sans-serif"
+                    android:text="Total Value Change"
+                    android:textColor="@color/color_subheader"
+                    android:textSize="26sp" />
+
+
+            </RelativeLayout>
+
 
             <RelativeLayout
                 android:id="@+id/activity_stock_detail_chart_layout"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
-                android:layout_below="@id/activity_stock_detail_price_change_textView">
+                android:layout_below="@id/activity_stock_detail_price_change_layout">
 
                 <com.github.mikephil.charting.charts.LineChart
                     android:id="@+id/activity_stock_detail_chart"

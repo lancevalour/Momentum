@@ -67,8 +67,9 @@ public class FavoriteRecyclerAdapter extends RecyclerView.Adapter<FavoriteRecycl
 
 
         if (priceChangePercent.substring(0, 1).equals("-")) {
-            holder.recycler_item_favorite_price_change_textView.setTextColor(context.getResources().getColor(R.color.theme_accent));
+            holder.recycler_item_favorite_price_change_textView.setTextColor(context.getResources().getColor(R.color.theme_red));
         } else {
+            holder.recycler_item_favorite_price_change_textView.setText("+" + priceChange + " " + priceChangePercent + "%");
             holder.recycler_item_favorite_price_change_textView.setTextColor(context.getResources().getColor(R.color.theme_primary));
         }
 
