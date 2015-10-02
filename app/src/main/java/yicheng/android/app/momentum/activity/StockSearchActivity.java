@@ -486,7 +486,7 @@ public class StockSearchActivity extends AppCompatActivity {
         if (isStockInPortfolio) {
             activity_stock_search_total_value_textView.setVisibility(View.VISIBLE);
             activity_stock_search_total_value_change_textView.setVisibility(View.VISIBLE);
-            activity_stock_search_sell_button.setVisibility(View.VISIBLE);
+            activity_stock_search_sell_button.setEnabled(true);
 
             Double[] value = null;
             try {
@@ -499,11 +499,11 @@ public class StockSearchActivity extends AppCompatActivity {
             }
 
 
-            String totalValue = String.valueOf(value[2] * stock.getQuote().getPrice().doubleValue());
+            String totalValue = String.valueOf(String.format("%.2f", value[2] * stock.getQuote().getPrice().doubleValue()));
 
             activity_stock_search_total_value_textView.setText(totalValue);
 
-            String valueChange = String.valueOf((stock.getQuote().getPrice().doubleValue() - value[0]) * value[2]);
+            String valueChange = String.valueOf(String.format("%.2f", (stock.getQuote().getPrice().doubleValue() - value[0]) * value[2]));
             activity_stock_search_total_value_change_textView.setText(valueChange);
 
 
@@ -518,7 +518,8 @@ public class StockSearchActivity extends AppCompatActivity {
         } else {
             activity_stock_search_total_value_textView.setVisibility(View.INVISIBLE);
             activity_stock_search_total_value_change_textView.setVisibility(View.INVISIBLE);
-            activity_stock_search_sell_button.setVisibility(View.INVISIBLE);
+
+            activity_stock_search_sell_button.setEnabled(false);
         }
 
 

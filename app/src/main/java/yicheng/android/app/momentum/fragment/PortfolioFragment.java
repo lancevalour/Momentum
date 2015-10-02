@@ -28,6 +28,7 @@ import yahoofinance.Stock;
 import yahoofinance.YahooFinance;
 import yicheng.android.app.momentum.R;
 import yicheng.android.app.momentum.adapter.FavoriteRecyclerAdapter;
+import yicheng.android.app.momentum.adapter.PortfolioRecyclerAdapter;
 import yicheng.android.app.momentum.model.Snappy;
 
 /**
@@ -83,7 +84,7 @@ public class PortfolioFragment extends Fragment {
                             fragment_portfolio_textView.setVisibility(View.INVISIBLE);
                         }
 
-                        fragment_portfolio_recyclerView.setAdapter(new FavoriteRecyclerAdapter(stockList));
+                        fragment_portfolio_recyclerView.setAdapter(new PortfolioRecyclerAdapter(stockList));
 
                     }
                     break;
