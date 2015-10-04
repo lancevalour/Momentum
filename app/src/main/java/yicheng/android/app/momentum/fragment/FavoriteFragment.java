@@ -30,6 +30,7 @@ import com.nineoldandroids.view.ViewHelper;
 import com.snappydb.DB;
 import com.snappydb.KeyIterator;
 import com.snappydb.SnappydbException;
+import com.squareup.picasso.Picasso;
 
 
 import java.io.IOException;
@@ -126,6 +127,7 @@ public class FavoriteFragment extends Fragment {
     private void initiateComponents() {
 
         fragment_favorite_imageView = (ImageView) rootView.findViewById(R.id.fragment_favorite_imageView);
+        Picasso.with(rootView.getContext()).load(R.drawable.favorite).into(fragment_favorite_imageView);
 
         fragment_favorite_toolbar = (Toolbar) rootView.findViewById(R.id.fragment_favorite_toolbar);
         fragment_favorite_toolbar.setBackgroundColor(ScrollUtils.getColorWithAlpha(0, getResources().getColor(R.color.theme_primary)));
@@ -309,7 +311,7 @@ public class FavoriteFragment extends Fragment {
             @Override
             public void onScrollChanged(int scrollY, boolean firstScroll, boolean dragging) {
                 int baseColor = getResources().getColor(R.color.theme_primary);
-                float alpha = Math.min(1, (float) (scrollY + 490 - parallaxImageHeight) / parallaxImageHeight);
+                float alpha = Math.min(1, (float) (scrollY + 490 - parallaxImageHeight / 2) / parallaxImageHeight);
 
                 fragment_favorite_toolbar.setBackgroundColor(ScrollUtils.getColorWithAlpha(alpha, baseColor));
                 ViewHelper.setTranslationY(fragment_favorite_imageView, -scrollY - 490);

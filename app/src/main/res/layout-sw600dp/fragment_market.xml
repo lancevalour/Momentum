@@ -8,15 +8,14 @@
         android:id="@+id/fragment_market_imageView"
         android:layout_width="match_parent"
         android:layout_height="@dimen/flexible_space_image_height"
-        android:scaleType="centerCrop"
-        android:src="@drawable/market" />
+        android:scaleType="centerCrop" />
 
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/fragment_market_refreshLayout"
         android:layout_width="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp">
 
         <com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView
             android:id="@+id/fragment_market_recyclerView"

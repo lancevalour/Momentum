@@ -77,28 +77,40 @@ public class PortfolioRecyclerAdapter extends RecyclerView.Adapter<PortfolioRecy
         }
 
 
-        Double[] value = null;
+        boolean isStockInPortfolio = false;
         try {
             portfolioDB = Snappy.open(context, Snappy.DB_NAME_PORTFOLIO);
-            value = portfolioDB.getObjectArray(symbol, Double.class);
+            isStockInPortfolio = portfolioDB.exists(symbol);
             portfolioDB.close();
 
         } catch (SnappydbException e) {
             e.printStackTrace();
         }
 
-        String totalValue = String.valueOf(String.format("%.2f", value[2] * stock.getQuote().getPrice().doubleValue()));
+        if (isStockInPortfolio) {
+            Double[] value = null;
+            try {
+                portfolioDB = Snappy.open(context, Snappy.DB_NAME_PORTFOLIO);
+                value = portfolioDB.getObjectArray(symbol, Double.class);
+                portfolioDB.close();
 
-        holder.recycler_item_portfolio_total_value_textView.setText(totalValue);
+            } catch (SnappydbException e) {
+                e.printStackTrace();
+            }
 
-        String valueChange = String.valueOf(String.format("%.2f", (stock.getQuote().getPrice().doubleValue() - value[0]) * value[2]));
-        holder.recycler_item_portfolio_total_value_change_textView.setText(valueChange);
+            String totalValue = String.valueOf(String.format("%.2f", value[2] * stock.getQuote().getPrice().doubleValue()));
 
-        if (holder.recycler_item_portfolio_total_value_change_textView.getText().toString().substring(0, 1).equals("-")) {
-            holder.recycler_item_portfolio_total_value_change_textView.setTextColor(context.getResources().getColor(R.color.theme_red));
-        } else {
-            holder.recycler_item_portfolio_total_value_change_textView.setText("+" + valueChange);
-            holder.recycler_item_portfolio_total_value_change_textView.setTextColor(context.getResources().getColor(R.color.theme_primary));
+            holder.recycler_item_portfolio_total_value_textView.setText(totalValue);
+
+            String valueChange = String.valueOf(String.format("%.2f", (stock.getQuote().getPrice().doubleValue() - value[0]) * value[2]));
+            holder.recycler_item_portfolio_total_value_change_textView.setText(valueChange);
+
+            if (holder.recycler_item_portfolio_total_value_change_textView.getText().toString().substring(0, 1).equals("-")) {
+                holder.recycler_item_portfolio_total_value_change_textView.setTextColor(context.getResources().getColor(R.color.theme_red));
+            } else {
+                holder.recycler_item_portfolio_total_value_change_textView.setText("+" + valueChange);
+                holder.recycler_item_portfolio_total_value_change_textView.setTextColor(context.getResources().getColor(R.color.theme_primary));
+            }
         }
 
 

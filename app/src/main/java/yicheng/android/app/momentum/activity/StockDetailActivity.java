@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.DialogPreference;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -73,12 +74,16 @@ public class StockDetailActivity extends AppCompatActivity {
     Handler handler;
 
     DB favoriteDB;
-
     DB portfolioDB;
+    DB portfolioSummaryDB;
 
     double buyPrice;
     double buyShares;
     double buyTotal;
+
+    double sellPrice;
+    double sellShares;
+    double sellTotal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -339,12 +344,6 @@ public class StockDetailActivity extends AppCompatActivity {
 
                 buyPriceEditText.setText(String.valueOf(stock.getQuote().getPrice()));
 
-/*
-
-                buyPriceEditText.getBackground().setColorFilter(getResources().getColor(R.color.theme_primary), PorterDuff.Mode.SRC_ATOP);
-                buySharesEditText.getBackground().setColorFilter(getResources().getColor(R.color.theme_primary), PorterDuff.Mode.SRC_ATOP);
-                totalEditText.getBackground().setColorFilter(getResources().getColor(R.color.theme_primary), PorterDuff.Mode.SRC_ATOP);
-*/
 
                 totalEditText.addTextChangedListener(new TextWatcher() {
                     @Override
@@ -400,18 +399,34 @@ public class StockDetailActivity extends AppCompatActivity {
                         } else {
 
                             buyPrice = Double.parseDouble(buyPriceEditText.getText().toString());
-                            buyTotal = Double.parseDouble(totalEditText.getText().toString());
-                            buyShares = buyTotal / buyPrice;
 
+                            if (!buySharesEditText.getText().toString().trim().equals("")) {
+                                buyShares = Double.parseDouble(buySharesEditText.getText().toString());
+                                buyTotal = buyShares * buyPrice;
+                            } else {
+                                buyTotal = Double.parseDouble(totalEditText.getText().toString());
+                                buyShares = buyTotal / buyPrice;
+                            }
+
+                            Double[] value;
                             try {
-                                portfolioDB = Snappy.open(getBaseContext(), Snappy.DB_NAME_PORTFOLIO);
-                                portfolioDB.put(stockSymbol, new Double[]{buyPrice, buyTotal, buyShares});
-                                portfolioDB.close();
 
+                                portfolioDB = Snappy.open(getBaseContext(), Snappy.DB_NAME_PORTFOLIO);
+                                if (portfolioDB.exists(stockSymbol)) {
+                                    value = portfolioDB.getObjectArray(stockSymbol, Double.class);
+                                    portfolioDB.put(stockSymbol, new Double[]{value[0], value[1] + buyTotal, value[2] + buyShares});
+                                } else {
+
+                                    portfolioDB.put(stockSymbol, new Double[]{buyPrice, buyTotal, buyShares});
+
+                                }
+
+                                portfolioDB.close();
 
                             } catch (SnappydbException e) {
                                 e.printStackTrace();
                             }
+
 
                             updateValueUI();
 
@@ -444,6 +459,196 @@ public class StockDetailActivity extends AppCompatActivity {
         activity_stock_detail_sell_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                AlertDialog.Builder dialogbuilder = new AlertDialog.Builder(StockDetailActivity.this);
+
+                dialogbuilder.setTitle("Sell");
+
+                View dialogView = getLayoutInflater().inflate(R.layout.dialog_sell, null);
+
+                dialogbuilder.setView(dialogView);
+
+
+                final TextInputLayout dialog_sell_total_layout = (TextInputLayout) dialogView.findViewById(R.id.dialog_sell_total_layout);
+                final TextInputLayout dialog_sell_shares_layout = (TextInputLayout) dialogView.findViewById(R.id.dialog_sell_shares_layout);
+
+
+                final EditText sellSharesEditText = dialog_sell_shares_layout.getEditText();
+                final EditText totalEditText = dialog_sell_total_layout.getEditText();
+
+
+                Double[] value = null;
+                try {
+                    portfolioDB = Snappy.open(getBaseContext(), Snappy.DB_NAME_PORTFOLIO);
+                    value = portfolioDB.getObjectArray(stockSymbol, Double.class);
+                    portfolioDB.close();
+
+                } catch (SnappydbException e) {
+                    e.printStackTrace();
+                }
+
+                final double totalShares = value[2];
+                final double totalValue = value[2] * stock.getQuote().getPrice().doubleValue();
+
+                dialog_sell_shares_layout.setHint("Total Shares: " + String.valueOf(String.format("%.2f", totalShares)));
+                dialog_sell_total_layout.setHint("Total Value: " + String.valueOf(String.format("%.2f", totalValue)));
+
+                final double stockPrice = stock.getQuote().getPrice().doubleValue();
+
+                totalEditText.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        if (s.toString().trim().length() > 0) {
+                            sellSharesEditText.setEnabled(false);
+                        } else {
+                            sellSharesEditText.setEnabled(true);
+                        }
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+
+                    }
+                });
+
+                sellSharesEditText.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        if (s.toString().trim().length() > 0) {
+                            totalEditText.setEnabled(false);
+                        } else {
+                            totalEditText.setEnabled(true);
+                        }
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+
+                    }
+                });
+
+                dialogbuilder.setPositiveButton("Sell", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        if (sellSharesEditText.getText().toString().trim().equals("")
+                                && totalEditText.getText().toString().trim().equals("")) {
+                            Toast.makeText(getBaseContext(), "One of info is empty.", Toast.LENGTH_SHORT).show();
+                        } else {
+
+                            sellPrice = stockPrice;
+
+
+                         /*   double totalValue = value[2] * stock.getQuote().getPrice().doubleValue();
+
+                            double valueChange = (stock.getQuote().getPrice().doubleValue() - value[0]) * value[2];
+*/
+                            if (!sellSharesEditText.getText().toString().trim().equals("")) {
+                                if (Double.parseDouble(sellSharesEditText.getText().toString().trim()) > totalShares) {
+
+                                    Toast.makeText(getBaseContext(), "Can't sell more than you have.", Toast.LENGTH_SHORT).show();
+
+                                    dialog.cancel();
+
+                                } else if (Double.parseDouble(sellSharesEditText.getText().toString().trim()) == totalShares) {
+
+                                    sellTotal = totalValue;
+                                    sellShares = totalShares;
+
+                                } else {
+                                    sellShares = Double.parseDouble(sellSharesEditText.getText().toString());
+                                    sellTotal = sellShares * sellPrice;
+                                }
+
+
+                            } else {
+                                if (Double.parseDouble(totalEditText.getText().toString().trim()) > totalValue) {
+                                    Toast.makeText(getBaseContext(), "Can't sell more than you have.", Toast.LENGTH_SHORT).show();
+
+                                    dialog.cancel();
+                                } else if (Double.parseDouble(totalEditText.getText().toString().trim()) == totalValue) {
+
+                                    sellTotal = totalValue;
+                                    sellShares = totalShares;
+
+                                } else {
+                                    sellTotal = Double.parseDouble(totalEditText.getText().toString());
+                                    sellShares = sellTotal / sellPrice;
+                                }
+
+                            }
+
+
+                            try {
+                                portfolioDB = Snappy.open(getBaseContext(), Snappy.DB_NAME_PORTFOLIO);
+                                portfolioDB.put(stockSymbol, new Double[]{buyPrice, totalValue - sellTotal, totalShares - sellShares});
+                                portfolioDB.close();
+
+                                portfolioSummaryDB = Snappy.open(getBaseContext(), Snappy.DB_NAME_PORTFOLIO_SUMMARY);
+                                double cash = portfolioSummaryDB.getDouble(Snappy.DB_PORTFOLIO_SUMMARY_KEY_CASH);
+                                portfolioSummaryDB.putDouble(Snappy.DB_PORTFOLIO_SUMMARY_KEY_CASH, cash + sellTotal);
+                                portfolioSummaryDB.close();
+
+                            } catch (SnappydbException e) {
+                                e.printStackTrace();
+                            }
+
+
+                            updateValueUI();
+
+                        }
+
+
+                    }
+                });
+
+                dialogbuilder.setNeutralButton("Sell All", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        buyPrice = stock.getQuote().getPrice().doubleValue();
+
+                        try {
+                            portfolioDB = Snappy.open(getBaseContext(), Snappy.DB_NAME_PORTFOLIO);
+                            portfolioDB.put(stockSymbol, new Double[]{buyPrice, 0.0, 0.0});
+                            portfolioDB.close();
+
+                            portfolioSummaryDB = Snappy.open(getBaseContext(), Snappy.DB_NAME_PORTFOLIO_SUMMARY);
+                            double cash = portfolioSummaryDB.getDouble(Snappy.DB_PORTFOLIO_SUMMARY_KEY_CASH);
+                            portfolioSummaryDB.putDouble(Snappy.DB_PORTFOLIO_SUMMARY_KEY_CASH, cash + sellTotal);
+                            portfolioSummaryDB.close();
+
+                        } catch (SnappydbException e) {
+                            e.printStackTrace();
+                        }
+
+                        updateValueUI();
+                    }
+                });
+
+                dialogbuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+
+                AlertDialog dialog = dialogbuilder.create();
+                dialog.show();
+
+                dialog.getButton(dialog.BUTTON_NEUTRAL).setTextColor(getResources().getColor(R.color.theme_accent));
+                dialog.getButton(dialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.theme_accent));
+                dialog.getButton(dialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.theme_accent));
+
 
             }
         });

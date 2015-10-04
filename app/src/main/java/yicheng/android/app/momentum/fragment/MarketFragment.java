@@ -27,6 +27,7 @@ import com.github.ksoichiro.android.observablescrollview.ScrollState;
 import com.github.ksoichiro.android.observablescrollview.ScrollUtils;
 import com.nineoldandroids.view.ViewHelper;
 import com.snappydb.DB;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -158,6 +159,7 @@ public class MarketFragment extends Fragment {
     private void initiateComponents() {
         //fragment_market_recyclerView_background = rootView.findViewById(R.id.fragment_market_recyclerView_background);
         fragment_market_imageView = (ImageView) rootView.findViewById(R.id.fragment_market_imageView);
+        Picasso.with(rootView.getContext()).load(R.drawable.market).into(fragment_market_imageView);
 
         fragment_market_toolbar = (Toolbar) rootView.findViewById(R.id.fragment_market_toolbar);
         fragment_market_toolbar.setBackgroundColor(ScrollUtils.getColorWithAlpha(0, getResources().getColor(R.color.theme_primary)));
@@ -217,7 +219,7 @@ public class MarketFragment extends Fragment {
             public void onScrollChanged(int scrollY, boolean firstScroll, boolean dragging) {
 
                 int baseColor = getResources().getColor(R.color.theme_primary);
-                float alpha = Math.min(1, (float) (scrollY + 490 - parallaxImageHeight) / parallaxImageHeight);
+                float alpha = Math.min(1, (float) (scrollY + 490 - parallaxImageHeight / 2) / parallaxImageHeight);
 
                 fragment_market_toolbar.setBackgroundColor(ScrollUtils.getColorWithAlpha(alpha, baseColor));
                 ViewHelper.setTranslationY(fragment_market_imageView, -scrollY - 490);

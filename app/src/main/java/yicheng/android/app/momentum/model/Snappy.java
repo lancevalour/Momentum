@@ -11,7 +11,9 @@ public class Snappy extends DBFactory {
     public static final String DB_NAME_PORTFOLIO = "portfolio";
     public static final String DB_NAME_TRENDING = "trending";
 
-    public static final String DB_PORTFOLIO_KEY_ASSET = "TotalAsset";
+
+    public static final String DB_NAME_PORTFOLIO_SUMMARY = "portfolio_summary";
+    public static final String DB_PORTFOLIO_SUMMARY_KEY_CASH = "Cash";
 
 
     public Snappy() {

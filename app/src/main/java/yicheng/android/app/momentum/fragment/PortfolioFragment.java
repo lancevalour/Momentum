@@ -27,6 +27,7 @@ import com.github.ksoichiro.android.observablescrollview.ScrollUtils;
 import com.snappydb.DB;
 import com.snappydb.KeyIterator;
 import com.snappydb.SnappydbException;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -60,10 +61,13 @@ public class PortfolioFragment extends Fragment {
 
     ImageView fragment_portfolio_imageView;
 
+    TextView fragment_portfolio_cash_textView, fragment_portfolio_total_value_textView,
+            fragment_portfolio_total_value_change_textView;
 
     List<Stock> stockList;
 
     DB portfolioDB;
+    DB portfolioSummaryDB;
 
     Handler handler;
 
@@ -101,6 +105,42 @@ public class PortfolioFragment extends Fragment {
                             fragment_portfolio_textView.setVisibility(View.INVISIBLE);
                         }
 
+
+                        double totalValue = 0;
+                        double totalValueChange = 0;
+                        double cash = 0;
+                        for (Stock stock : stockList) {
+                            Double[] value = null;
+                            try {
+                                portfolioDB = Snappy.open(rootView.getContext(), Snappy.DB_NAME_PORTFOLIO);
+                                value = portfolioDB.getObjectArray(stock.getSymbol(), Double.class);
+                                portfolioDB.close();
+
+                                portfolioSummaryDB = Snappy.open(rootView.getContext(), Snappy.DB_NAME_PORTFOLIO_SUMMARY);
+                                if (portfolioSummaryDB.exists(Snappy.DB_PORTFOLIO_SUMMARY_KEY_CASH)) {
+                                    cash = portfolioSummaryDB.getDouble(Snappy.DB_PORTFOLIO_SUMMARY_KEY_CASH);
+                                } else {
+                                    cash = 0;
+                                }
+
+                                portfolioSummaryDB.close();
+
+
+                            } catch (SnappydbException e) {
+                                e.printStackTrace();
+                            }
+
+                            totalValue += value[2] * stock.getQuote().getPrice().doubleValue();
+                            totalValueChange += (stock.getQuote().getPrice().doubleValue() - value[0]) * value[2];
+
+                        }
+
+
+                        fragment_portfolio_total_value_textView.setText(String.format("%.2f", totalValue));
+                        fragment_portfolio_total_value_change_textView.setText(String.format("%.2f", totalValueChange));
+                        fragment_portfolio_cash_textView.setText(String.format("%.2f", cash));
+
+
                         fragment_portfolio_recyclerView.setAdapter(new PortfolioRecyclerAdapter(stockList));
 
                     }
@@ -134,6 +174,7 @@ public class PortfolioFragment extends Fragment {
                                 KeyIterator keyIt = portfolioDB.allKeysIterator();
                                 if (keyIt.hasNext()) {
                                     keys = keyIt.next(10000);
+
                                     System.out.println(Arrays.toString(keys));
                                 }
                                 keyIt.close();
@@ -142,7 +183,6 @@ public class PortfolioFragment extends Fragment {
                             } catch (SnappydbException e) {
                                 e.printStackTrace();
                             }
-
 
                             if (keys != null) {
                                 Map<String, Stock> map = YahooFinance.get(keys);
@@ -163,9 +203,17 @@ public class PortfolioFragment extends Fragment {
 
     }
 
+
     private void initiateComponents() {
 
+        fragment_portfolio_cash_textView = (TextView) rootView.findViewById(R.id.fragment_portfolio_cash_textView);
+        fragment_portfolio_total_value_textView = (TextView) rootView.findViewById(R.id.fragment_portfolio_total_value_textView);
+        fragment_portfolio_total_value_change_textView = (TextView) rootView.findViewById(R.id.fragment_portfolio_total_value_change_textView);
+
+
         fragment_portfolio_imageView = (ImageView) rootView.findViewById(R.id.fragment_portfolio_imageView);
+        Picasso.with(rootView.getContext()).load(R.drawable.portfolio).into(fragment_portfolio_imageView);
+
 
         fragment_portfolio_toolbar = (Toolbar) rootView.findViewById(R.id.fragment_portfolio_toolbar);
         fragment_portfolio_toolbar.setBackgroundColor(ScrollUtils.getColorWithAlpha(0, getResources().getColor(R.color.theme_primary)));
@@ -229,6 +277,7 @@ public class PortfolioFragment extends Fragment {
     }
 
     int parallaxImageHeight;
+
     private void setRecyclerViewScrollControl() {
         parallaxImageHeight = getResources().getDimensionPixelSize(
                 R.dimen.flexible_space_image_height);
@@ -237,7 +286,7 @@ public class PortfolioFragment extends Fragment {
             @Override
             public void onScrollChanged(int scrollY, boolean firstScroll, boolean dragging) {
                 int baseColor = getResources().getColor(R.color.theme_primary);
-                float alpha = Math.min(1, (float) (scrollY + 490 - parallaxImageHeight) / parallaxImageHeight);
+                float alpha = Math.min(1, (float) (scrollY + 490 - parallaxImageHeight / 2) / parallaxImageHeight);
 
                 fragment_portfolio_toolbar.setBackgroundColor(ScrollUtils.getColorWithAlpha(alpha, baseColor));
                 ViewHelper.setTranslationY(fragment_portfolio_imageView, -scrollY - 490);
@@ -276,6 +325,12 @@ public class PortfolioFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         fragmentCallback = null;
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        loadStockData();
     }
 
 }

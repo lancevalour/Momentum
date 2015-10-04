@@ -9,8 +9,7 @@
         android:id="@+id/fragment_portfolio_imageView"
         android:layout_width="match_parent"
         android:layout_height="@dimen/flexible_space_image_height"
-        android:scaleType="centerCrop"
-        android:src="@drawable/trending" />
+        android:scaleType="centerCrop" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -25,7 +24,7 @@
             android:fontFamily="sans-serif-light"
             android:text="Total Value"
             android:textColor="@color/text_primary_light"
-            android:textSize="40sp" />
+            android:textSize="32sp" />
 
         <TextView
             android:id="@+id/fragment_portfolio_total_value_change_textView"
@@ -37,7 +36,19 @@
             android:fontFamily="sans-serif-light"
             android:text="Total Value Change"
             android:textColor="@color/text_primary_light"
-            android:textSize="36sp" />
+            android:textSize="32sp" />
+
+        <TextView
+            android:id="@+id/fragment_portfolio_cash_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/fragment_portfolio_total_value_change_textView"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="10dp"
+            android:fontFamily="sans-serif-light"
+            android:text="Cash"
+            android:textColor="@color/text_primary_light"
+            android:textSize="32sp" />
 
     </RelativeLayout>
 
