@@ -234,6 +234,8 @@ public class StockSearchActivity extends AppCompatActivity {
                 final EditText buySharesEditText = dialog_buy_shares_layout.getEditText();
                 final EditText totalEditText = dialog_buy_total_layout.getEditText();
 
+                buyPriceEditText.setText(String.valueOf(stock.getQuote().getPrice()));
+
                 totalEditText.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -290,8 +292,8 @@ public class StockSearchActivity extends AppCompatActivity {
 
                             try {
                                 portfolioDB = Snappy.open(getBaseContext(), Snappy.DB_NAME_PORTFOLIO);
-                                favoriteDB.put(stockSymbol, new Object[]{stock, buyPrice, buyTotal, buyShares});
-                                favoriteDB.close();
+                                portfolioDB.put(stockSymbol, new Double[]{buyPrice, buyTotal, buyShares});
+                                portfolioDB.close();
 
                             } catch (SnappydbException e) {
                                 e.printStackTrace();
@@ -325,6 +327,20 @@ public class StockSearchActivity extends AppCompatActivity {
         activity_stock_search_sell_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+              /*  try {
+                    portfolioDB = Snappy.open(getBaseContext(), Snappy.DB_NAME_PORTFOLIO);
+                    portfolioDB.del(stockSymbol);
+
+                    portfolioDB.put();
+                    portfolioDB.put(stockSymbol,
+                            new Double[]{stock.getQuote().getPrice().doubleValue(), buyTotal, buyShares});
+                    portfolioDB.close();
+
+                } catch (SnappydbException e) {
+                    e.printStackTrace();
+                }*/
+
 
             }
         });

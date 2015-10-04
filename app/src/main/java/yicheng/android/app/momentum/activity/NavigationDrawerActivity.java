@@ -42,10 +42,12 @@ import yicheng.android.app.momentum.fragment.TrendingFragment;
 /**
  * Created by ZhangY on 8/17/2015.
  */
-public class NavigationDrawerActivity extends AppCompatActivity {
+public class NavigationDrawerActivity extends AppCompatActivity implements
+        PortfolioFragment.FragmentCallback, MarketFragment.FragmentCallback,
+        SettingsFragment.FragmentCallback, FavoriteFragment.FragmentCallback,
+        TrendingFragment.FragmentCallback {
     DrawerLayout activity_navigation_drawer_layout;
 
-    Toolbar activity_navigation_drawer_toolbar;
     FrameLayout activity_navigation_drawer_content_framelayout;
 
     NavigationView activity_navigation_drawer_navigation_view;
@@ -55,7 +57,6 @@ public class NavigationDrawerActivity extends AppCompatActivity {
 
     FloatingActionButton activity_navigation_drawer_search_fab;
 
-    ActionBarDrawerToggle drawerToggle;
 
     TextView email;
 
@@ -94,46 +95,15 @@ public class NavigationDrawerActivity extends AppCompatActivity {
 
         activity_navigation_drawer_layout = (DrawerLayout) findViewById(R.id.activity_navigation_drawer_layout);
 
-        activity_navigation_drawer_toolbar = (Toolbar) findViewById(R.id.activity_navigation_drawer_toolbar);
-
-        setSupportActionBar(activity_navigation_drawer_toolbar);
-
-
         activity_navigation_drawer_content_framelayout = (FrameLayout) findViewById(R.id.activity_navigation_drawer_content_framelayout);
 
         activity_navigation_drawer_navigation_view = (NavigationView) findViewById(R.id.activity_navigation_drawer_navigation_view);
 
-
         activity_navigation_drawer_navigation_view.getMenu().findItem(curDrawerItemId).setChecked(true);
-
 
         activity_navigation_drawer_search_fab = (FloatingActionButton) findViewById(R.id.activity_navigation_drawer_search_fab);
         activity_navigation_drawer_search_fab.setIcon(R.drawable.ic_action_search);
-        //  activity_navigation_drawer_floatingActionMenu = (FloatingActionsMenu) findViewById(R.id.activity_navigation_drawer_floatingActionMenu);
 
-
-        drawerToggle = new ActionBarDrawerToggle(this, activity_navigation_drawer_layout, activity_navigation_drawer_toolbar, R.string.navigation_drawer_open,
-                R.string.navigation_drawer_close) {
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                // code here will execute once the drawer is opened( As I dont
-                // want anything happened whe drawer is
-                // open I am not going to put anything here)
-             /*   if (activity_navigation_drawer_floatingActionMenu.isExpanded()) {
-                    activity_navigation_drawer_floatingActionMenu.collapse();
-                }*/
-            }
-
-            @Override
-            public void onDrawerClosed(View drawerView) {
-                super.onDrawerClosed(drawerView);
-                // Code here will execute once drawer is closed
-
-            }
-        };
-        activity_navigation_drawer_layout.setDrawerListener(drawerToggle);
-        drawerToggle.syncState();
 
         navigate(curDrawerItemId);
 
@@ -142,49 +112,26 @@ public class NavigationDrawerActivity extends AppCompatActivity {
     private void navigate(final int itemId) {
         // perform the actual navigation logic, updating the main content fragment etc
         Fragment frontFragment = null;
-        int titleStringID = R.string.app_name;
 
         switch (itemId) {
             case R.id.drawer_market: {
                 frontFragment = new MarketFragment();
-                titleStringID = R.string.drawer_title_market;
-               /* runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    System.out.println(
-                                            get("http://d.yimg.com/autoc.finance.yahoo.com/autoc?query=yahoo&callback=YAHOO.Finance.SymbolSuggest.ssCallback"));
-
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }).start();
-                    }
-                });*/
             }
             break;
             case R.id.drawer_portfolio: {
                 frontFragment = new PortfolioFragment();
-                titleStringID = R.string.drawer_title_portfolio;
             }
             break;
             case R.id.drawer_favorite: {
                 frontFragment = new FavoriteFragment();
-                titleStringID = R.string.drawer_title_favorite;
             }
             break;
             case R.id.drawer_trending: {
                 frontFragment = new TrendingFragment();
-                titleStringID = R.string.drawer_title_trending;
             }
             break;
             case R.id.drawer_settings: {
                 frontFragment = new SettingsFragment();
-                titleStringID = R.string.drawer_title_settings;
             }
             break;
         }
@@ -195,10 +142,6 @@ public class NavigationDrawerActivity extends AppCompatActivity {
                 .replace(
                         R.id.activity_navigation_drawer_content_framelayout,
                         frontFragment).commit();
-
-        getSupportActionBar()
-                .setTitle(
-                        titleStringID);
 
     }
 
@@ -215,56 +158,10 @@ public class NavigationDrawerActivity extends AppCompatActivity {
                 Intent intent = new Intent(NavigationDrawerActivity.this, StockSearchActivity.class);
                 v.getContext().startActivity(intent);
 
-
-             /*   runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-
-                                    try {
-                                        String response = get("http://d.yimg.com/autoc.finance.yahoo.com/autoc?query=yahoo&callback=YAHOO.Finance.SymbolSuggest.ssCallback");
-
-                                        response = response.substring("YAHOO.Finance.SymbolSuggest.ssCallback(".length(), response.length() - 1);
-
-
-                                        JSONObject object = new JSONObject(response);
-
-                                        JSONArray array = object.getJSONObject("ResultSet").getJSONArray("Result");
-
-                                        for (int i = 0; i < array.length(); i++) {
-                                            System.out.println(array.getJSONObject(i).get("symbol"));
-                                        }
-
-
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }).start();
-                    }
-                });*/
             }
         });
     }
 
-
-    OkHttpClient client = new OkHttpClient();
-
-    private String get(String url) throws IOException {
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-
-        Response response = client.newCall(request).execute();
-        return response.body().string();
-    }
 
     private void setNavigationViewControl() {
         activity_navigation_drawer_navigation_view.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -316,4 +213,15 @@ public class NavigationDrawerActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         outState.putInt(this.DRAWER_ID, curDrawerItemId);
     }
+
+    @Override
+    public void menuClick() {
+        activity_navigation_drawer_layout.openDrawer(GravityCompat.START);
+    }
+
+    @Override
+    public void menuSearch() {
+        //   getSupportFragmentManager().beginTransaction().replace(R.id.containerSearch, new FragmentSearch()).addToBackStack(null).commit();
+    }
+
 }

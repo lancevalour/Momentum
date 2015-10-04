@@ -337,6 +337,8 @@ public class StockDetailActivity extends AppCompatActivity {
                 final EditText buySharesEditText = dialog_buy_shares_layout.getEditText();
                 final EditText totalEditText = dialog_buy_total_layout.getEditText();
 
+                buyPriceEditText.setText(String.valueOf(stock.getQuote().getPrice()));
+
 /*
 
                 buyPriceEditText.getBackground().setColorFilter(getResources().getColor(R.color.theme_primary), PorterDuff.Mode.SRC_ATOP);
