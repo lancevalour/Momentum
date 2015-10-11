@@ -62,6 +62,8 @@ import yicheng.android.app.momentum.model.Snappy;
  * Created by ZhangY on 9/21/2015.
  */
 public class StockSearchActivity extends AppCompatActivity {
+
+
     Button activity_stock_search_buy_button, activity_stock_search_sell_button;
 
 
@@ -604,7 +606,7 @@ public class StockSearchActivity extends AppCompatActivity {
                         try {
 
                             try {
-                                String response = httpGet("http://d.yimg.com/autoc.finance.yahoo.com/autoc?query=" + s + "&callback=YAHOO.Finance.SymbolSuggest.ssCallback");
+                                String response = httpGet("http://d.yimg.com/autoc.finance.yahoo.com/autoc?query=" + s + "&region=1&lang=en&callback=YAHOO.Finance.SymbolSuggest.ssCallback");
 
                                 response = response.substring("YAHOO.Finance.SymbolSuggest.ssCallback(".length(), response.length() - 1);
 
