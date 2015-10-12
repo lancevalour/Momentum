@@ -195,8 +195,8 @@ public class StockSearchActivity extends AppCompatActivity {
         activity_stock_search_price_textView = (TextView) findViewById(R.id.activity_stock_search_price_textView);
         activity_stock_search_price_change_textView = (TextView) findViewById(R.id.activity_stock_search_price_change_textView);
 
-        activity_stock_search_total_value_textView = (TextView) findViewById(R.id.activity_stock_detail_total_value_textView);
-        activity_stock_search_total_value_change_textView = (TextView) findViewById(R.id.activity_stock_detail_total_value_change_textView);
+        activity_stock_search_total_value_textView = (TextView) findViewById(R.id.activity_stock_search_total_value_textView);
+        activity_stock_search_total_value_change_textView = (TextView) findViewById(R.id.activity_stock_search_total_value_change_textView);
 
 
         activity_stock_search_toolbar = (Toolbar) findViewById(R.id.activity_stock_search_toolbar);
@@ -554,7 +554,7 @@ public class StockSearchActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         try {
-
+                       
                             stock = YahooFinance.get(stockSymbol);
 
                             Message msg = Message.obtain();
@@ -606,7 +606,8 @@ public class StockSearchActivity extends AppCompatActivity {
                         try {
 
                             try {
-                                String response = httpGet("http://d.yimg.com/autoc.finance.yahoo.com/autoc?query=" + s + "&region=1&lang=en&callback=YAHOO.Finance.SymbolSuggest.ssCallback");
+                                String response = httpGet(
+                                        "http://d.yimg.com/autoc.finance.yahoo.com/autoc?query=" + s + "&region=1&lang=en&callback=YAHOO.Finance.SymbolSuggest.ssCallback");
 
                                 response = response.substring("YAHOO.Finance.SymbolSuggest.ssCallback(".length(), response.length() - 1);
 
